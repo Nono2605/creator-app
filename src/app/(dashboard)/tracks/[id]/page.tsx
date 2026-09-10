@@ -50,9 +50,16 @@ export default async function TrackPage({ params }: { params: Promise<{ id: stri
     notFound();
   }
 
-  const declaration = await api.get<Declaration | null>(`/creator/tracks/${id}/declaration`, {
-    accessToken: session.access_token,
-  });
+  // Section secondaire : une panne ici ne doit pas empêcher de voir/gérer le
+  // morceau lui-même — dégrade en formulaire vierge plutôt que de planter la page.
+  let declaration: Declaration | null = null;
+  try {
+    declaration = await api.get<Declaration | null>(`/creator/tracks/${id}/declaration`, {
+      accessToken: session.access_token,
+    });
+  } catch {
+    declaration = null;
+  }
 
   return (
     <div style={{ maxWidth: 640, display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>

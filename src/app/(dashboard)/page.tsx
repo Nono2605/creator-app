@@ -17,10 +17,26 @@ interface Album {
 
 export default async function OverviewPage() {
   const { session, artist } = await requireArtist();
-  const [{ data: tracks }, { data: albums }] = await Promise.all([
-    api.get<{ data: Track[] }>("/creator/tracks", { accessToken: session.access_token }),
-    api.get<{ data: Album[] }>("/creator/albums", { accessToken: session.access_token }),
-  ]);
+
+  let tracks: Track[];
+  let albums: Album[];
+  try {
+    const [tracksRes, albumsRes] = await Promise.all([
+      api.get<{ data: Track[] }>("/creator/tracks", { accessToken: session.access_token }),
+      api.get<{ data: Album[] }>("/creator/albums", { accessToken: session.access_token }),
+    ]);
+    tracks = tracksRes.data;
+    albums = albumsRes.data;
+  } catch (err) {
+    return (
+      <div style={{ maxWidth: 480 }}>
+        <h1 style={{ fontSize: "1.75rem", marginBottom: "var(--space-sm)" }}>Welcome back, {artist.name}</h1>
+        <p style={{ color: "#ff6b6b" }}>
+          {err instanceof Error ? err.message : "Could not load your dashboard."}
+        </p>
+      </div>
+    );
+  }
 
   const publishedCount = tracks.filter((t) => t.status === "published").length;
   const recentTracks = tracks.slice(0, 5);

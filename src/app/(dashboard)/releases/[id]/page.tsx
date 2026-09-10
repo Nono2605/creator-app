@@ -46,10 +46,17 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
     notFound();
   }
 
-  const { data: allTracks } = await api.get<{ data: CreatorTrack[] }>("/creator/tracks", {
-    accessToken: session.access_token,
-  });
-  const availableTracks = allTracks.filter((t) => t.album_id !== release.id);
+  // Section secondaire : une panne ici ne doit pas empêcher de voir/gérer la
+  // release elle-même — dégrade en liste vide plutôt que de planter la page.
+  let availableTracks: CreatorTrack[] = [];
+  try {
+    const { data: allTracks } = await api.get<{ data: CreatorTrack[] }>("/creator/tracks", {
+      accessToken: session.access_token,
+    });
+    availableTracks = allTracks.filter((t) => t.album_id !== release.id);
+  } catch {
+    availableTracks = [];
+  }
 
   return (
     <div style={{ maxWidth: 640, display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
