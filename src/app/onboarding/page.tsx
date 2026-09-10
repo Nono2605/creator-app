@@ -12,7 +12,12 @@ export default async function OnboardingPage() {
   } = await supabase.auth.getSession();
   if (!session) redirect("/login");
 
-  const me = await api.get<Me>("/me", { accessToken: session.access_token });
+  let me: Me;
+  try {
+    me = await api.get<Me>("/me", { accessToken: session.access_token });
+  } catch (err) {
+    return <ErrorNotice message={err instanceof Error ? err.message : "Could not load your account."} />;
+  }
 
   if (me.role !== "creator" && me.role !== "admin") {
     return (
@@ -26,9 +31,16 @@ export default async function OnboardingPage() {
     );
   }
 
-  const artist = await api.get<Artist | null>("/creator/artist", {
-    accessToken: session.access_token,
-  });
+  let artist: Artist | null;
+  try {
+    artist = await api.get<Artist | null>("/creator/artist", {
+      accessToken: session.access_token,
+    });
+  } catch (err) {
+    return (
+      <ErrorNotice message={err instanceof Error ? err.message : "Could not load your artist profile."} />
+    );
+  }
   if (artist) redirect("/tracks");
 
   return (
@@ -36,6 +48,15 @@ export default async function OnboardingPage() {
       <h1 style={titleStyle}>Create your artist page</h1>
       <p style={subtitleStyle}>This is the public identity your tracks will be released under.</p>
       <ArtistForm />
+    </div>
+  );
+}
+
+function ErrorNotice({ message }: { message: string }) {
+  return (
+    <div style={wrapperStyle}>
+      <h1 style={titleStyle}>Something went wrong</h1>
+      <p style={{ color: "#ff6b6b" }}>{message}</p>
     </div>
   );
 }
