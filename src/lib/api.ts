@@ -1,4 +1,6 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
+// Un "/" final dans NEXT_PUBLIC_API_BASE_URL (facile à laisser en copiant
+// l'URL Render) produirait sinon des requêtes en "//me" — 404 côté Express.
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!.replace(/\/+$/, "");
 
 interface ApiOptions {
   accessToken?: string;
