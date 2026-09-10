@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
-import { Suspense } from "react";
-import { Nav, NavFallback } from "@/components/Nav";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -19,15 +17,13 @@ export const metadata: Metadata = {
   description: "Upload and manage your music on BRAND.",
 };
 
+// Coquille minimale : la navigation vit dans (dashboard)/layout.tsx (sidebar),
+// propre aux pages authentifiées + artiste créé. Les pages hors de ce groupe
+// (login, signup, onboarding) restent volontairement sans chrome partagé.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
-      <body>
-        <Suspense fallback={<NavFallback />}>
-          <Nav />
-        </Suspense>
-        <main style={{ flex: 1 }}>{children}</main>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

@@ -5,6 +5,7 @@
   --color-bg: #05070d;
   --color-bg-secondary: #071a33;
   --color-card: #0d111a;
+  --color-sidebar: #080b14;
 
   --color-blue: #1683ff;
   --color-blue-bright: #38a7ff;
@@ -23,6 +24,7 @@
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 
   --content-max-width: 1280px;
+  --sidebar-width: 232px;
   --space-xs: 0.5rem;
   --space-sm: 1rem;
   --space-md: 1.5rem;
@@ -46,6 +48,8 @@
 html {
   height: 100%;
   color-scheme: dark;
+  scroll-behavior: smooth;
+  scrollbar-color: var(--color-border) transparent;
 }
 
 html,
@@ -61,8 +65,34 @@ body {
   color: var(--color-text);
   background: var(--color-bg);
   font-family: var(--font-body);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--color-violet-soft);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-blue-bright);
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(247, 249, 252, 0.2);
 }
 
 a {
@@ -74,9 +104,213 @@ h1,
 h2,
 h3 {
   font-family: var(--font-heading);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 input,
-button {
+button,
+textarea {
   font-family: inherit;
+}
+
+/* ---------------------------------------------------------------------
+   Utilitaires partagés — boutons, champs, cartes, menus.
+   --------------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform var(--transition-base), opacity var(--transition-base),
+    border-color var(--transition-base), color var(--transition-base),
+    background-color var(--transition-base);
+}
+.btn:disabled {
+  cursor: default;
+  opacity: 0.6;
+  transform: none;
+}
+
+.btn-primary {
+  background: var(--gradient-signature);
+  color: #fff;
+}
+.btn-primary:not(:disabled):hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+.btn-primary:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+.btn-secondary:not(:disabled):hover {
+  border-color: var(--color-blue-bright);
+  color: var(--color-blue-bright);
+}
+
+.btn-danger {
+  background: transparent;
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.4);
+}
+.btn-danger:not(:disabled):hover {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: #ff6b6b;
+}
+
+.btn-plain {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  transition: color var(--transition-base), opacity var(--transition-base);
+}
+.btn-plain:hover {
+  opacity: 0.8;
+}
+
+.input-field {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-text);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+.input-field::placeholder {
+  color: var(--color-text-muted);
+}
+.input-field:focus-visible {
+  outline: none;
+  border-color: var(--color-blue-bright);
+  box-shadow: 0 0 0 3px rgba(56, 167, 255, 0.15);
+}
+
+.hover-card {
+  display: block;
+  transition: transform var(--transition-base);
+}
+.hover-card:hover {
+  transform: translateY(-3px);
+}
+
+.list-row {
+  transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+.list-row:hover {
+  background: var(--color-card);
+  border-color: var(--color-blue-bright);
+}
+
+.icon-btn {
+  transition: transform var(--transition-base), opacity var(--transition-base);
+}
+.icon-btn:hover {
+  transform: scale(1.06);
+}
+.icon-btn:active {
+  transform: scale(0.96);
+}
+
+/* ---------------------------------------------------------------------
+   Dashboard — coquille (sidebar + cartes), inspirée de la maquette
+   "Creator Studio". Structure et données réelles, pas de faux chiffres :
+   les cartes sans données disponibles affichent un état "Coming soon".
+   --------------------------------------------------------------------- */
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+.sidebar-link:hover {
+  color: var(--color-text);
+  background: rgba(247, 249, 252, 0.04);
+}
+.sidebar-link.active {
+  color: var(--color-text);
+  background: rgba(56, 104, 255, 0.16);
+  font-weight: 600;
+}
+
+.dash-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.stat-card .stat-label {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+.stat-card .stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  transition: border-color var(--transition-base), color var(--transition-base),
+    background-color var(--transition-base);
+}
+.pill:hover {
+  border-color: var(--color-blue-bright);
+  color: var(--color-text);
+}
+.pill.active {
+  border-color: var(--color-blue-bright);
+  background: rgba(56, 167, 255, 0.12);
+  color: var(--color-text);
+}
+
+.coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: var(--color-text-muted);
+}
+.coming-soon .badge {
+  display: inline-flex;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }

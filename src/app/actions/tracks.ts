@@ -100,3 +100,17 @@ export async function removeFile(trackId: string, fileId: string): Promise<void>
   await api.delete(`/creator/tracks/${trackId}/files/${fileId}`, { accessToken: token });
   revalidatePath(`/tracks/${trackId}`);
 }
+
+export async function declareProvenance(
+  trackId: string,
+  provenance: "human" | "ai" | "hybrid",
+  description: string
+): Promise<void> {
+  const token = await accessToken();
+  await api.post(
+    `/creator/tracks/${trackId}/declaration`,
+    { provenance, description: description || undefined },
+    { accessToken: token }
+  );
+  revalidatePath(`/tracks/${trackId}`);
+}
