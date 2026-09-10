@@ -45,3 +45,17 @@ le port 3000).
 Tous les endpoints créateur sont sous `/creator/*` dans `musicAPI`
 (`../musicAPI/src/modules/creator/routes.ts`), protégés par
 `requireAuth` + `requireCreator`.
+
+## Déploiement
+
+Vercel (build auto sur chaque push vers `main`), backend `musicAPI` sur
+Render. Variables d'environnement à renseigner dans Vercel (Production et
+Preview) — jamais commitées, voir `.env.example` :
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `NEXT_PUBLIC_API_BASE_URL` — URL du service `musicapi` sur Render
+
+Côté Render, `CORS_ALLOWED_ORIGINS` (dashboard, jamais dans `render.yaml`)
+doit inclure le domaine Vercel de cette app, sinon les appels API sont
+bloqués par le navigateur.
