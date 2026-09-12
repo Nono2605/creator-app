@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireArtist } from "@/lib/session";
 import { Sidebar } from "@/components/Sidebar";
 import { logout } from "@/app/actions/auth";
@@ -10,9 +11,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <Sidebar />
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
         <header style={headerStyle}>
-          <span style={{ color: "var(--color-text-muted)" }}>
+          <Link href="/artist" style={{ color: "var(--color-text-muted)" }}>
             Creator Studio — <strong style={{ color: "var(--color-text)" }}>{artist.name}</strong>
-          </span>
+          </Link>
           <form action={logout}>
             <button type="submit" className="btn-plain" style={{ color: "var(--color-text-muted)" }}>
               Log out
