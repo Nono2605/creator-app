@@ -1,15 +1,7 @@
 import Link from "next/link";
 import { requireArtist } from "@/lib/session";
 import { api } from "@/lib/api";
-import { StatusBadge } from "@/components/StatusBadge";
-
-interface Track {
-  id: string;
-  title: string;
-  status: string;
-  duration_seconds: number | null;
-  created_at: string;
-}
+import { TracksList, type Track } from "./TracksList";
 
 export default async function TracksPage() {
   const { session, artist } = await requireArtist();
@@ -29,20 +21,7 @@ export default async function TracksPage() {
         </Link>
       </div>
 
-      <div className="dash-card">
-        {tracks.length === 0 ? (
-          <p style={{ color: "var(--color-text-muted)" }}>No tracks yet. Upload your first one.</p>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            {tracks.map((track) => (
-              <Link key={track.id} href={`/tracks/${track.id}`} className="list-row" style={rowStyle}>
-                <span>{track.title}</span>
-                <StatusBadge status={track.status} />
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+      <TracksList tracks={tracks} />
     </div>
   );
 }
@@ -53,13 +32,4 @@ const headerRowStyle: React.CSSProperties = {
   alignItems: "center",
   flexWrap: "wrap",
   gap: "var(--space-sm)",
-};
-
-const rowStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: "0.65rem var(--space-sm)",
-  borderRadius: "var(--radius-sm)",
-  border: "1px solid var(--color-border)",
 };
