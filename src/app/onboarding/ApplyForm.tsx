@@ -16,7 +16,7 @@ export function ApplyForm() {
     <form action={action} style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
       <div style={termsBoxStyle}>
         <p style={{ fontWeight: 600, marginBottom: "0.5rem" }}>Creator Terms of Service</p>
-        <p style={{ color: "var(--color-text-muted)", fontSize: "0.875rem" }}>
+        <p style={{ color: "var(--cream-muted)", fontSize: "0.875rem" }}>
           Placeholder — final text to come. By using creator features you agree to only upload
           content you have the rights to, to accurately declare how it was produced, and to
           comply with our content and royalties policies once published.
@@ -43,14 +43,14 @@ export function ApplyForm() {
       </label>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-        <label htmlFor="primary_genre" style={{ color: "var(--color-text-muted)", fontSize: "0.875rem" }}>
+        <label htmlFor="primary_genre" style={{ color: "var(--cream-muted)", fontSize: "0.875rem" }}>
           Primary genre (optional)
         </label>
-        <input id="primary_genre" name="primary_genre" type="text" style={inputStyle} />
+        <input id="primary_genre" name="primary_genre" type="text" className="input-field" />
       </div>
 
-      {state?.error && <p style={{ color: "#ff6b6b" }}>{state.error}</p>}
-      <button type="submit" disabled={pending} style={buttonStyle}>
+      {state?.error && <p style={{ color: "var(--danger)" }}>{state.error}</p>}
+      <button type="submit" disabled={pending} className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
         {pending ? "Enabling…" : "Enable creator mode"}
       </button>
     </form>
@@ -60,8 +60,8 @@ export function ApplyForm() {
 const termsBoxStyle: React.CSSProperties = {
   padding: "var(--space-sm) var(--space-md)",
   borderRadius: "var(--radius-sm)",
-  border: "1px solid var(--color-border)",
-  background: "var(--color-card)",
+  border: "1px solid var(--line)",
+  background: "var(--surface)",
   maxHeight: 160,
   overflowY: "auto",
 };
@@ -73,7 +73,7 @@ const checkboxRowStyle: React.CSSProperties = {
 };
 
 const fieldsetStyle: React.CSSProperties = {
-  border: "1px solid var(--color-border)",
+  border: "1px solid var(--line)",
   borderRadius: "var(--radius-sm)",
   padding: "var(--space-sm) var(--space-md)",
   display: "flex",
@@ -83,24 +83,6 @@ const fieldsetStyle: React.CSSProperties = {
 
 const legendStyle: React.CSSProperties = {
   padding: "0 0.35rem",
-  color: "var(--color-text-muted)",
+  color: "var(--cream-muted)",
   fontSize: "0.875rem",
-};
-
-const inputStyle: React.CSSProperties = {
-  padding: "0.75rem 1rem",
-  borderRadius: "var(--radius-sm)",
-  border: "1px solid var(--color-border)",
-  background: "var(--color-card)",
-  color: "var(--color-text)",
-};
-
-const buttonStyle: React.CSSProperties = {
-  padding: "0.75rem 1rem",
-  borderRadius: "var(--radius-sm)",
-  border: "none",
-  background: "var(--gradient-signature)",
-  color: "#fff",
-  fontWeight: 600,
-  cursor: "pointer",
 };

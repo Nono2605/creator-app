@@ -63,7 +63,7 @@ export function TracksList({ tracks }: { tracks: Track[] }) {
   if (tracks.length === 0) {
     return (
       <div className="dash-card">
-        <p style={{ color: "var(--color-text-muted)" }}>No tracks yet. Upload your first one.</p>
+        <p style={{ color: "var(--cream-muted)" }}>No tracks yet. Upload your first one.</p>
       </div>
     );
   }
@@ -71,7 +71,7 @@ export function TracksList({ tracks }: { tracks: Track[] }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "0.5rem" }}>
-        <label htmlFor="track-sort" style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)" }}>
+        <label htmlFor="track-sort" style={{ fontSize: "0.8125rem", color: "var(--cream-muted)" }}>
           Sort by
         </label>
         <select
@@ -95,11 +95,11 @@ export function TracksList({ tracks }: { tracks: Track[] }) {
             <Link key={track.id} href={`/tracks/${track.id}`} className="list-row" style={rowStyle}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div>{track.title}</div>
-                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
+                <div style={{ fontSize: "0.75rem", color: "var(--cream-muted)" }}>
                   {track.albums ? `${track.albums.title} · ${track.albums.type}` : "No release"}
                 </div>
               </div>
-              <span style={{ color: "var(--color-text-muted)", fontVariantNumeric: "tabular-nums", fontSize: "0.875rem" }}>
+              <span style={{ color: "var(--cream-muted)", fontVariantNumeric: "tabular-nums", fontSize: "0.875rem" }}>
                 {formatDuration(track.duration_seconds)}
               </span>
               <StatusBadge status={track.status} />
@@ -117,5 +117,5 @@ const rowStyle: React.CSSProperties = {
   gap: "var(--space-sm)",
   padding: "0.65rem var(--space-sm)",
   borderRadius: "var(--radius-sm)",
-  border: "1px solid var(--color-border)",
+  border: "1px solid var(--line)",
 };

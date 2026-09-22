@@ -63,27 +63,27 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", flexWrap: "wrap" }}>
         <h1 style={{ fontSize: "1.75rem" }}>{release.title}</h1>
         <StatusBadge status={release.status} />
-        <span style={{ color: "var(--color-text-muted)", textTransform: "capitalize" }}>{release.type}</span>
+        <span style={{ color: "var(--cream-muted)", textTransform: "capitalize" }}>{release.type}</span>
       </div>
 
       <section className="dash-card">
-        <h2 style={sectionTitleStyle}>Tracks</h2>
+        <h2 className="section-title">Tracks</h2>
         {release.tracks.length === 0 ? (
-          <p style={{ color: "var(--color-text-muted)" }}>No tracks in this release yet.</p>
+          <p style={{ color: "var(--cream-muted)" }}>No tracks in this release yet.</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             {release.tracks.map((track, index) => (
               <div key={track.id} className="list-row" style={rowStyle}>
-                <span style={{ color: "var(--color-text-muted)", width: 20, textAlign: "right" }}>
+                <span style={{ color: "var(--cream-muted)", width: 20, textAlign: "right" }}>
                   {track.track_number ?? index + 1}
                 </span>
                 <span style={{ flex: 1 }}>{track.title}</span>
                 <StatusBadge status={track.status} />
-                <span style={{ color: "var(--color-text-muted)", fontVariantNumeric: "tabular-nums" }}>
+                <span style={{ color: "var(--cream-muted)", fontVariantNumeric: "tabular-nums" }}>
                   {formatDuration(track.duration_seconds)}
                 </span>
                 <form action={removeTrackFromRelease.bind(null, track.id, release.id)}>
-                  <button type="submit" className="btn-plain" style={{ color: "var(--color-text-muted)" }}>
+                  <button type="submit" className="btn-plain" style={{ color: "var(--cream-muted)" }}>
                     Remove
                   </button>
                 </form>
@@ -95,14 +95,14 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
 
       {availableTracks.length > 0 && (
         <section className="dash-card">
-          <h2 style={sectionTitleStyle}>Add tracks</h2>
+          <h2 className="section-title">Add tracks</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "var(--space-sm)" }}>
             {availableTracks.map((track) => (
               <div key={track.id} className="list-row" style={rowStyle}>
                 <span style={{ flex: 1 }}>{track.title}</span>
                 <StatusBadge status={track.status} />
                 <form action={assignTrackToRelease.bind(null, track.id, release.id)}>
-                  <button type="submit" className="btn-plain" style={{ color: "var(--color-blue-bright)", fontWeight: 600 }}>
+                  <button type="submit" className="btn-plain" style={{ color: "var(--copper)", fontWeight: 600 }}>
                     Add
                   </button>
                 </form>
@@ -146,19 +146,11 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
   );
 }
 
-const sectionTitleStyle: React.CSSProperties = {
-  fontSize: "1rem",
-  textTransform: "uppercase",
-  letterSpacing: "0.03em",
-  color: "var(--color-text-muted)",
-  marginBottom: "var(--space-sm)",
-};
-
 const rowStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: "var(--space-sm)",
   padding: "0.6rem var(--space-sm)",
   borderRadius: "var(--radius-sm)",
-  border: "1px solid var(--color-border)",
+  border: "1px solid var(--line)",
 };

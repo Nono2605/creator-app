@@ -1,20 +1,23 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Fraunces, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
+  weight: "variable",
+  style: ["normal", "italic"],
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const ibmPlexSans = IBM_Plex_Sans({
+  variable: "--font-ibm-plex-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "BRAND Creator",
-  description: "Upload and manage your music on BRAND.",
+  title: "Creator Studio — Vynl",
+  description: "Upload tracks, build releases and declare how your music was made, on Vynl.",
 };
 
 // Coquille minimale : la navigation vit dans (dashboard)/layout.tsx (sidebar),
@@ -22,7 +25,7 @@ export const metadata: Metadata = {
 // (login, signup, onboarding) restent volontairement sans chrome partagé.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
+    <html lang="en" className={`${fraunces.variable} ${ibmPlexSans.variable}`}>
       <body>{children}</body>
     </html>
   );

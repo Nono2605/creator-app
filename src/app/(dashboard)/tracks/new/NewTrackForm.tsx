@@ -62,9 +62,9 @@ export function NewTrackForm() {
         required
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        style={inputStyle}
+        className="input-field"
       />
-      <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--color-text-muted)" }}>
+      <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--cream-muted)" }}>
         <input type="checkbox" checked={explicit} onChange={(e) => setExplicit(e.target.checked)} />
         Explicit content
       </label>
@@ -72,30 +72,12 @@ export function NewTrackForm() {
         type="file"
         accept="audio/*"
         onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-        style={{ color: "var(--color-text-muted)" }}
+        style={{ color: "var(--cream-muted)" }}
       />
-      {error && <p style={{ color: "#ff6b6b" }}>{error}</p>}
-      <button type="submit" disabled={pending} style={buttonStyle}>
+      {error && <p style={{ color: "var(--danger)" }}>{error}</p>}
+      <button type="submit" disabled={pending} className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
         {pending ? status ?? "Saving…" : "Create track"}
       </button>
     </form>
   );
 }
-
-const inputStyle: React.CSSProperties = {
-  padding: "0.75rem 1rem",
-  borderRadius: "var(--radius-sm)",
-  border: "1px solid var(--color-border)",
-  background: "var(--color-card)",
-  color: "var(--color-text)",
-};
-
-const buttonStyle: React.CSSProperties = {
-  padding: "0.75rem 1rem",
-  borderRadius: "var(--radius-sm)",
-  border: "none",
-  background: "var(--gradient-signature)",
-  color: "#fff",
-  fontWeight: 600,
-  cursor: "pointer",
-};

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { api } from "@/lib/api";
 import type { Me, Artist } from "@/lib/session";
+import { Logo } from "@/components/Logo";
 import { ApplyForm } from "./ApplyForm";
 import { ArtistForm } from "./ArtistForm";
 
@@ -22,6 +23,9 @@ export default async function OnboardingPage() {
   if (me.role !== "creator" && me.role !== "admin") {
     return (
       <div style={wrapperStyle}>
+        <div style={logoStyle}>
+          <Logo />
+        </div>
         <h1 style={titleStyle}>Become a creator</h1>
         <p style={subtitleStyle}>
           Enable creator mode on your account to upload and manage music.
@@ -45,6 +49,9 @@ export default async function OnboardingPage() {
 
   return (
     <div style={wrapperStyle}>
+      <div style={logoStyle}>
+        <Logo />
+      </div>
       <h1 style={titleStyle}>Create your artist page</h1>
       <p style={subtitleStyle}>This is the public identity your tracks will be released under.</p>
       <ArtistForm />
@@ -55,8 +62,11 @@ export default async function OnboardingPage() {
 function ErrorNotice({ message }: { message: string }) {
   return (
     <div style={wrapperStyle}>
+      <div style={logoStyle}>
+        <Logo />
+      </div>
       <h1 style={titleStyle}>Something went wrong</h1>
-      <p style={{ color: "#ff6b6b" }}>{message}</p>
+      <p style={{ color: "var(--danger)" }}>{message}</p>
     </div>
   );
 }
@@ -67,12 +77,16 @@ const wrapperStyle: React.CSSProperties = {
   padding: "0 var(--space-md)",
 };
 
+const logoStyle: React.CSSProperties = {
+  marginBottom: "var(--space-lg)",
+};
+
 const titleStyle: React.CSSProperties = {
   fontSize: "1.75rem",
   marginBottom: "var(--space-sm)",
 };
 
 const subtitleStyle: React.CSSProperties = {
-  color: "var(--color-text-muted)",
+  color: "var(--cream-muted)",
   marginBottom: "var(--space-md)",
 };

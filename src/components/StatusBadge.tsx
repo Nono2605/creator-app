@@ -1,27 +1,15 @@
-const COLORS: Record<string, string> = {
-  draft: "var(--color-text-muted)",
-  in_review: "var(--color-blue-bright)",
-  published: "#3ddc97",
-  archived: "var(--color-text-muted)",
+// Même vocabulaire visuel que le badge "Live"/"Coming" de vynl.com/creators.html :
+// contour plein + point plein pour ce qui est acté, contour pointillé + point
+// creux pour ce qui ne l'est pas (encore, ou plus).
+const VARIANTS: Record<string, string> = {
+  draft: "status--soon",
+  in_review: "status--copper",
+  published: "status--live",
+  archived: "status--soon",
 };
 
 export function StatusBadge({ status }: { status: string }) {
-  const color = COLORS[status] ?? "var(--color-text-muted)";
+  const variant = VARIANTS[status] ?? "status--soon";
 
-  return (
-    <span
-      style={{
-        display: "inline-block",
-        padding: "0.15rem 0.6rem",
-        borderRadius: "999px",
-        fontSize: "0.75rem",
-        fontWeight: 600,
-        color,
-        border: `1px solid ${color}`,
-        textTransform: "capitalize",
-      }}
-    >
-      {status.replace("_", " ")}
-    </span>
-  );
+  return <span className={`status ${variant}`}>{status.replace("_", " ")}</span>;
 }

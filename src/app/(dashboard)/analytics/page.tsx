@@ -31,7 +31,7 @@ export default async function AnalyticsPage() {
     return (
       <div style={{ maxWidth: "var(--content-max-width)" }}>
         <h1 style={{ fontSize: "1.75rem", marginBottom: "var(--space-md)" }}>Analytics</h1>
-        <p style={{ color: "#ff6b6b" }}>
+        <p style={{ color: "var(--danger)" }}>
           {err instanceof Error ? err.message : "Could not load analytics."}
         </p>
       </div>
@@ -46,7 +46,7 @@ export default async function AnalyticsPage() {
     <div style={{ maxWidth: "var(--content-max-width)", display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
       <div>
         <h1 style={{ fontSize: "1.75rem" }}>Analytics</h1>
-        <p style={{ color: "var(--color-text-muted)" }}>{artist.name}</p>
+        <p style={{ color: "var(--cream-muted)" }}>{artist.name}</p>
       </div>
 
       <div style={statsGridStyle}>
@@ -68,18 +68,18 @@ export default async function AnalyticsPage() {
 
       <div style={twoColStyle}>
         <section className="dash-card">
-          <h2 style={sectionTitleStyle}>Tracks by status</h2>
+          <h2 className="section-title">Tracks by status</h2>
           {statusBreakdown.length === 0 ? (
-            <p style={{ color: "var(--color-text-muted)" }}>No tracks yet.</p>
+            <p style={{ color: "var(--cream-muted)" }}>No tracks yet.</p>
           ) : (
             <BreakdownBars items={statusBreakdown} />
           )}
         </section>
 
         <section className="dash-card">
-          <h2 style={sectionTitleStyle}>Releases by type</h2>
+          <h2 className="section-title">Releases by type</h2>
           {releaseTypeBreakdown.length === 0 ? (
-            <p style={{ color: "var(--color-text-muted)" }}>No releases yet.</p>
+            <p style={{ color: "var(--cream-muted)" }}>No releases yet.</p>
           ) : (
             <BreakdownBars items={releaseTypeBreakdown} />
           )}
@@ -87,16 +87,16 @@ export default async function AnalyticsPage() {
       </div>
 
       <section className="dash-card">
-        <h2 style={sectionTitleStyle}>AI declarations</h2>
+        <h2 className="section-title">AI declarations</h2>
         {provenanceBreakdown.length === 0 ? (
-          <p style={{ color: "var(--color-text-muted)" }}>No tracks yet.</p>
+          <p style={{ color: "var(--cream-muted)" }}>No tracks yet.</p>
         ) : (
           <BreakdownBars items={provenanceBreakdown} />
         )}
       </section>
 
       <div className="dash-card coming-soon">
-        <span className="badge">Coming soon</span>
+        <span className="status status--soon">Coming</span>
         <p style={{ maxWidth: "48ch" }}>
           Plays, listening time, and top tracks will show up here once streaming is instrumented.
         </p>
@@ -116,12 +116,4 @@ const twoColStyle: React.CSSProperties = {
   gridTemplateColumns: "1fr 1fr",
   gap: "var(--space-md)",
   alignItems: "start",
-};
-
-const sectionTitleStyle: React.CSSProperties = {
-  fontSize: "1rem",
-  textTransform: "uppercase",
-  letterSpacing: "0.03em",
-  color: "var(--color-text-muted)",
-  marginBottom: "var(--space-sm)",
 };

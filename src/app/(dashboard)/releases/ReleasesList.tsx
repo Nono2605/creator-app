@@ -56,7 +56,7 @@ export function ReleasesList({ releases }: { releases: Release[] }) {
   if (releases.length === 0) {
     return (
       <div className="dash-card">
-        <p style={{ color: "var(--color-text-muted)" }}>
+        <p style={{ color: "var(--cream-muted)" }}>
           No releases yet. Group your tracks into an album, EP, or single.
         </p>
       </div>
@@ -66,7 +66,7 @@ export function ReleasesList({ releases }: { releases: Release[] }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "0.5rem" }}>
-        <label htmlFor="release-sort" style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)" }}>
+        <label htmlFor="release-sort" style={{ fontSize: "0.8125rem", color: "var(--cream-muted)" }}>
           Sort by
         </label>
         <select
@@ -96,11 +96,11 @@ export function ReleasesList({ releases }: { releases: Release[] }) {
                   borderRadius: "var(--radius-sm)",
                   background: release.cover_url
                     ? `url(${release.cover_url}) center/cover`
-                    : "var(--gradient-signature)",
+                    : "var(--copper)",
                 }}
               />
               <span style={{ flex: 1 }}>{release.title}</span>
-              <span style={{ color: "var(--color-text-muted)", fontSize: "0.8125rem", textTransform: "capitalize" }}>
+              <span style={{ color: "var(--cream-muted)", fontSize: "0.8125rem", textTransform: "capitalize" }}>
                 {release.type}
               </span>
               <StatusBadge status={release.status} />
@@ -118,5 +118,5 @@ const rowStyle: React.CSSProperties = {
   gap: "var(--space-sm)",
   padding: "0.65rem var(--space-sm)",
   borderRadius: "var(--radius-sm)",
-  border: "1px solid var(--color-border)",
+  border: "1px solid var(--line)",
 };

@@ -54,26 +54,26 @@ export function ImageUploadField({
           maxWidth: round ? 96 : 480,
           aspectRatio,
           borderRadius: round ? "50%" : "var(--radius-md)",
-          background: preview ? `url(${preview}) center/cover` : "var(--gradient-signature)",
+          background: preview ? `url(${preview}) center/cover` : "var(--copper)",
           marginBottom: "0.5rem",
         }}
       />
       <input type="file" accept="image/*" onChange={handleChange} disabled={pending} />
       {pending && <p style={hintStyle}>Uploading…</p>}
-      {error && <p style={{ ...hintStyle, color: "#ff6b6b" }}>{error}</p>}
+      {error && <p style={{ ...hintStyle, color: "var(--danger)" }}>{error}</p>}
     </div>
   );
 }
 
 const labelStyle: React.CSSProperties = {
   fontSize: "0.8125rem",
-  color: "var(--color-text-muted)",
+  color: "var(--cream-muted)",
   display: "block",
   marginBottom: "0.5rem",
 };
 
 const hintStyle: React.CSSProperties = {
   fontSize: "0.8125rem",
-  color: "var(--color-text-muted)",
+  color: "var(--cream-muted)",
   marginTop: "0.35rem",
 };

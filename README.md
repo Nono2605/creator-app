@@ -1,6 +1,6 @@
 # CreatorApp-Beta
 
-App web séparée pour la partie créateur de BRAND : upload et gestion des
+App web séparée pour la partie créateur de Vynl : upload et gestion des
 morceaux, page artiste. Consomme le même backend (`../musicAPI`) et le même
 projet Supabase que `../musicapp.1.0.0` — un compte existant peut devenir
 créateur, pas de système d'auth séparé.

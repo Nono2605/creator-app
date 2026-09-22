@@ -65,9 +65,9 @@ export function AIDeclarationForm({
         <button type="button" onClick={handleSave} disabled={pending || !provenance} className="btn btn-primary">
           {pending ? "Saving…" : "Save declaration"}
         </button>
-        {saved && <span style={{ color: "var(--color-blue-bright)", fontSize: "0.875rem" }}>Saved</span>}
+        {saved && <span style={{ color: "var(--copper)", fontSize: "0.875rem" }}>Saved</span>}
       </div>
-      <p style={{ color: "var(--color-text-muted)", fontSize: "0.8125rem", marginTop: "0.5rem" }}>
+      <p style={{ color: "var(--cream-muted)", fontSize: "0.8125rem", marginTop: "0.5rem" }}>
         Recorded per track. A public display for listeners is coming soon.
       </p>
     </div>

@@ -76,9 +76,9 @@ export default async function TrackPage({ params }: { params: Promise<{ id: stri
       </form>
 
       <section className="dash-card">
-        <h2 style={sectionTitleStyle}>Audio files</h2>
+        <h2 className="section-title">Audio files</h2>
         {track.files.length === 0 ? (
-          <p style={{ color: "var(--color-text-muted)" }}>No audio file uploaded yet.</p>
+          <p style={{ color: "var(--cream-muted)" }}>No audio file uploaded yet.</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             {track.files.map((file) => (
@@ -87,7 +87,7 @@ export default async function TrackPage({ params }: { params: Promise<{ id: stri
                   {file.format.toUpperCase()} · {formatBytes(file.file_size_bytes)}
                 </span>
                 <form action={removeFile.bind(null, track.id, file.id)}>
-                  <button type="submit" className="btn-plain" style={{ color: "#ff6b6b" }}>
+                  <button type="submit" className="btn-plain" style={{ color: "var(--danger)" }}>
                     Remove
                   </button>
                 </form>
@@ -98,7 +98,7 @@ export default async function TrackPage({ params }: { params: Promise<{ id: stri
       </section>
 
       <section className="dash-card">
-        <h2 style={sectionTitleStyle}>AI declaration</h2>
+        <h2 className="section-title">AI declaration</h2>
         <AIDeclarationForm
           trackId={track.id}
           initialProvenance={declaration?.provenance ?? null}
@@ -140,19 +140,11 @@ export default async function TrackPage({ params }: { params: Promise<{ id: stri
   );
 }
 
-const sectionTitleStyle: React.CSSProperties = {
-  fontSize: "1rem",
-  textTransform: "uppercase",
-  letterSpacing: "0.03em",
-  color: "var(--color-text-muted)",
-  marginBottom: "var(--space-sm)",
-};
-
 const fileRowStyle: React.CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
   padding: "0.6rem var(--space-sm)",
   borderRadius: "var(--radius-sm)",
-  border: "1px solid var(--color-border)",
+  border: "1px solid var(--line)",
 };

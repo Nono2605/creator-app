@@ -70,7 +70,7 @@ export default async function AudiencePage() {
     return (
       <div style={{ maxWidth: "var(--content-max-width)" }}>
         <h1 style={{ fontSize: "1.75rem", marginBottom: "var(--space-md)" }}>Audience</h1>
-        <p style={{ color: "#ff6b6b" }}>
+        <p style={{ color: "var(--danger)" }}>
           {err instanceof Error ? err.message : "Could not load audience data."}
         </p>
       </div>
@@ -85,7 +85,7 @@ export default async function AudiencePage() {
     <div style={{ maxWidth: "var(--content-max-width)", display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
       <div>
         <h1 style={{ fontSize: "1.75rem" }}>Audience</h1>
-        <p style={{ color: "var(--color-text-muted)" }}>{artist.name}</p>
+        <p style={{ color: "var(--cream-muted)" }}>{artist.name}</p>
       </div>
 
       <div style={statsGridStyle}>
@@ -100,27 +100,27 @@ export default async function AudiencePage() {
       </div>
 
       <section className="dash-card">
-        <h2 style={sectionTitleStyle}>Follower growth (last {WINDOW_DAYS} days)</h2>
+        <h2 className="section-title">Follower growth (last {WINDOW_DAYS} days)</h2>
         {audience.followers_count === 0 ? (
-          <p style={{ color: "var(--color-text-muted)" }}>
+          <p style={{ color: "var(--cream-muted)" }}>
             No followers yet — growth will show up here once you have some.
           </p>
         ) : (
           <svg viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`} width="100%" height={CHART_HEIGHT} preserveAspectRatio="none">
             <defs>
               <linearGradient id="audience-growth-gradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--color-violet)" stopOpacity="0.4" />
-                <stop offset="100%" stopColor="var(--color-violet)" stopOpacity="0" />
+                <stop offset="0%" stopColor="var(--copper)" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="var(--copper)" stopOpacity="0" />
               </linearGradient>
             </defs>
             <path d={area} fill="url(#audience-growth-gradient)" />
-            <path d={line} fill="none" stroke="var(--color-violet-soft)" strokeWidth="2" />
+            <path d={line} fill="none" stroke="var(--copper)" strokeWidth="2" />
           </svg>
         )}
       </section>
 
       <div className="dash-card coming-soon">
-        <span className="badge">Coming soon</span>
+        <span className="status status--soon">Coming</span>
         <p style={{ maxWidth: "48ch" }}>
           Listening-based stats (unique listeners, listening time, geography) will show up here once streaming is
           instrumented.
@@ -134,12 +134,4 @@ const statsGridStyle: React.CSSProperties = {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
   gap: "var(--space-sm)",
-};
-
-const sectionTitleStyle: React.CSSProperties = {
-  fontSize: "1rem",
-  textTransform: "uppercase",
-  letterSpacing: "0.03em",
-  color: "var(--color-text-muted)",
-  marginBottom: "var(--space-sm)",
 };

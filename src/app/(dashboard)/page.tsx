@@ -31,7 +31,7 @@ export default async function OverviewPage() {
     return (
       <div style={{ maxWidth: 480 }}>
         <h1 style={{ fontSize: "1.75rem", marginBottom: "var(--space-sm)" }}>Welcome back, {artist.name}</h1>
-        <p style={{ color: "#ff6b6b" }}>
+        <p style={{ color: "var(--danger)" }}>
           {err instanceof Error ? err.message : "Could not load your dashboard."}
         </p>
       </div>
@@ -45,7 +45,7 @@ export default async function OverviewPage() {
     <div style={{ maxWidth: "var(--content-max-width)", display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
       <div>
         <h1 style={{ fontSize: "1.75rem" }}>Welcome back, {artist.name}</h1>
-        <p style={{ color: "var(--color-text-muted)" }}>Here&apos;s where things stand.</p>
+        <p style={{ color: "var(--cream-muted)" }}>Here&apos;s where things stand.</p>
       </div>
 
       <div style={statsGridStyle}>
@@ -66,13 +66,13 @@ export default async function OverviewPage() {
       <div style={twoColStyle}>
         <section className="dash-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-md)" }}>
-            <h2 style={sectionTitleStyle}>Recent tracks</h2>
+            <h2 className="section-title" style={{ marginBottom: 0 }}>Recent tracks</h2>
             <Link href="/tracks" className="text-link" style={{ fontSize: "0.875rem" }}>
               View all
             </Link>
           </div>
           {recentTracks.length === 0 ? (
-            <p style={{ color: "var(--color-text-muted)" }}>No tracks yet. Upload your first one.</p>
+            <p style={{ color: "var(--cream-muted)" }}>No tracks yet. Upload your first one.</p>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               {recentTracks.map((track) => (
@@ -86,7 +86,7 @@ export default async function OverviewPage() {
         </section>
 
         <section className="dash-card">
-          <h2 style={{ ...sectionTitleStyle, marginBottom: "var(--space-md)" }}>Quick actions</h2>
+          <h2 className="section-title" style={{ marginBottom: "var(--space-md)" }}>Quick actions</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
             <Link href="/tracks/new" className="btn btn-primary" style={{ justifyContent: "flex-start" }}>
               + New track
@@ -114,18 +114,11 @@ const twoColStyle: React.CSSProperties = {
   alignItems: "start",
 };
 
-const sectionTitleStyle: React.CSSProperties = {
-  fontSize: "1rem",
-  textTransform: "uppercase",
-  letterSpacing: "0.03em",
-  color: "var(--color-text-muted)",
-};
-
 const rowStyle: React.CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
   padding: "0.65rem var(--space-sm)",
   borderRadius: "var(--radius-sm)",
-  border: "1px solid var(--color-border)",
+  border: "1px solid var(--line)",
 };

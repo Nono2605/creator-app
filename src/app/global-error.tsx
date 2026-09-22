@@ -11,8 +11,8 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
           minHeight: "100vh",
           alignItems: "center",
           justifyContent: "center",
-          background: "#05070d",
-          color: "#f7f9fc",
+          background: "#15120f",
+          color: "#f4ece0",
           fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
         }}
       >
@@ -23,10 +23,10 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
             onClick={reset}
             style={{
               padding: "0.75rem 1rem",
-              borderRadius: 8,
+              borderRadius: 10,
               border: "none",
-              background: "linear-gradient(135deg, #1683ff 0%, #7047ff 100%)",
-              color: "#fff",
+              background: "#d98b3d",
+              color: "#15120f",
               fontWeight: 600,
               cursor: "pointer",
             }}

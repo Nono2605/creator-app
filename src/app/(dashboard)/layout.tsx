@@ -11,11 +11,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <Sidebar />
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
         <header style={headerStyle}>
-          <Link href="/artist" style={{ color: "var(--color-text-muted)" }}>
-            Creator Studio — <strong style={{ color: "var(--color-text)" }}>{artist.name}</strong>
+          <Link href="/artist" style={{ color: "var(--cream-muted)" }}>
+            <span style={{ fontFamily: "var(--font-display)", fontStyle: "italic" }}>Creator Studio</span> —{" "}
+            <strong style={{ color: "var(--cream)", fontWeight: 500 }}>{artist.name}</strong>
           </Link>
           <form action={logout}>
-            <button type="submit" className="btn-plain" style={{ color: "var(--color-text-muted)" }}>
+            <button type="submit" className="btn-plain" style={{ color: "var(--cream-muted)" }}>
               Log out
             </button>
           </form>
@@ -32,5 +33,5 @@ const headerStyle: React.CSSProperties = {
   alignItems: "center",
   gap: "var(--space-md)",
   padding: "var(--space-sm) var(--space-lg)",
-  borderBottom: "1px solid var(--color-border)",
+  borderBottom: "1px solid var(--line)",
 };

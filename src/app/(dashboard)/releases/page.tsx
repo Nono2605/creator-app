@@ -14,7 +14,7 @@ export default async function ReleasesPage() {
       <div style={headerRowStyle}>
         <div>
           <h1 style={{ fontSize: "1.75rem" }}>Releases</h1>
-          <p style={{ color: "var(--color-text-muted)" }}>{artist.name}</p>
+          <p style={{ color: "var(--cream-muted)" }}>{artist.name}</p>
         </div>
         <Link href="/releases/new" className="btn btn-primary">
           New release
