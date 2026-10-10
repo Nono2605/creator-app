@@ -15,7 +15,7 @@ export function ArtistProfileForm({ artist }: { artist: Artist }) {
 
       <form action={action} style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)", maxWidth: 420 }}>
         <label style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-          <span style={{ fontSize: "0.8125rem", color: "var(--cream-muted)" }}>Bio</span>
+          <span style={{ fontSize: "0.8125rem", color: "var(--vynl-texte-2)" }}>Bio</span>
           <textarea
             name="bio"
             defaultValue={artist.bio ?? ""}
@@ -25,11 +25,11 @@ export function ArtistProfileForm({ artist }: { artist: Artist }) {
           />
         </label>
         <label style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-          <span style={{ fontSize: "0.8125rem", color: "var(--cream-muted)" }}>Country</span>
+          <span style={{ fontSize: "0.8125rem", color: "var(--vynl-texte-2)" }}>Country</span>
           <input type="text" name="country" defaultValue={artist.country ?? ""} className="input-field" />
         </label>
-        {state?.error && <p style={{ color: "var(--danger)" }}>{state.error}</p>}
-        {state?.message && <p style={{ color: "var(--copper)" }}>{state.message}</p>}
+        {state?.error && <p style={{ color: "var(--vynl-erreur)" }}>{state.error}</p>}
+        {state?.message && <p style={{ color: "var(--vynl-succes)" }}>{state.message}</p>}
         <button type="submit" disabled={pending} className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
           {pending ? "Saving…" : "Save"}
         </button>

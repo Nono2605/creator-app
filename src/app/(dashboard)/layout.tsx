@@ -1,37 +1,38 @@
 import Link from "next/link";
 import { requireArtist } from "@/lib/session";
 import { Sidebar } from "@/components/Sidebar";
+import { Logo } from "@/components/Logo";
 import { logout } from "@/app/actions/auth";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { artist } = await requireArtist();
 
   return (
-    <div style={{ display: "flex", flex: 1 }}>
+    <div className="studio">
       <Sidebar />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        <header style={headerStyle}>
-          <Link href="/artist" style={{ color: "var(--cream-muted)" }}>
-            <span style={{ fontFamily: "var(--font-display)", fontStyle: "italic" }}>Creator Studio</span> —{" "}
-            <strong style={{ color: "var(--cream)", fontWeight: 500 }}>{artist.name}</strong>
+      <div className="studio__main">
+        <header className="studio__header">
+          {/* Sur mobile la barre latérale devient la barre du bas : le logo
+              remonte dans l'en-tête. */}
+          <Link href="/" className="studio__brand-mobile" aria-label="Vynl Creator Studio — overview">
+            <Logo />
+          </Link>
+          <Link href="/artist" className="studio__artist">
+            <span
+              className="avatar"
+              style={artist.avatar_url ? { backgroundImage: `url(${artist.avatar_url})` } : undefined}
+              aria-hidden="true"
+            />
+            <strong>{artist.name}</strong>
           </Link>
           <form action={logout}>
-            <button type="submit" className="btn-plain" style={{ color: "var(--cream-muted)" }}>
+            <button type="submit" className="btn-plain" style={{ color: "var(--vynl-texte-2)" }}>
               Log out
             </button>
           </form>
         </header>
-        <main style={{ flex: 1, padding: "var(--space-lg)" }}>{children}</main>
+        <main className="studio__content">{children}</main>
       </div>
     </div>
   );
 }
-
-const headerStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: "var(--space-md)",
-  padding: "var(--space-sm) var(--space-lg)",
-  borderBottom: "1px solid var(--line)",
-};

@@ -18,7 +18,7 @@ export function NewReleaseForm() {
     <form action={action} style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
       <input type="text" name="title" placeholder="Release title" required className="input-field" />
       <label style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-        <span style={{ fontSize: "0.8125rem", color: "var(--cream-muted)" }}>Type</span>
+        <span style={{ fontSize: "0.8125rem", color: "var(--vynl-texte-2)" }}>Type</span>
         <select name="type" defaultValue="single" className="input-field">
           {TYPES.map((type) => (
             <option key={type} value={type}>
@@ -27,7 +27,7 @@ export function NewReleaseForm() {
           ))}
         </select>
       </label>
-      {state?.error && <p style={{ color: "var(--danger)" }}>{state.error}</p>}
+      {state?.error && <p style={{ color: "var(--vynl-erreur)" }}>{state.error}</p>}
       <button type="submit" disabled={pending} className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
         {pending ? "Creating…" : "Create release"}
       </button>

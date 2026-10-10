@@ -63,7 +63,7 @@ export function TracksList({ tracks }: { tracks: Track[] }) {
   if (tracks.length === 0) {
     return (
       <div className="dash-card">
-        <p style={{ color: "var(--cream-muted)" }}>No tracks yet. Upload your first one.</p>
+        <p style={{ color: "var(--vynl-texte-2)" }}>No tracks yet. Upload your first one.</p>
       </div>
     );
   }
@@ -71,15 +71,14 @@ export function TracksList({ tracks }: { tracks: Track[] }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "0.5rem" }}>
-        <label htmlFor="track-sort" style={{ fontSize: "0.8125rem", color: "var(--cream-muted)" }}>
+        <label htmlFor="track-sort" style={{ fontSize: "0.8125rem", color: "var(--vynl-texte-2)" }}>
           Sort by
         </label>
         <select
           id="track-sort"
           value={sort}
           onChange={(e) => setSort(e.target.value as SortValue)}
-          className="input-field"
-          style={{ padding: "0.45rem 0.75rem", fontSize: "0.875rem" }}
+          className="input-field input-field--sm"
         >
           {SORT_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -92,14 +91,14 @@ export function TracksList({ tracks }: { tracks: Track[] }) {
       <div className="dash-card">
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           {sortedTracks.map((track) => (
-            <Link key={track.id} href={`/tracks/${track.id}`} className="list-row" style={rowStyle}>
-              <div style={{ flex: 1, minWidth: 0 }}>
+            <Link key={track.id} href={`/tracks/${track.id}`} className="list-row">
+              <div className="list-row__main">
                 <div>{track.title}</div>
-                <div style={{ fontSize: "0.75rem", color: "var(--cream-muted)" }}>
+                <div style={{ fontSize: "0.75rem", color: "var(--vynl-texte-2)" }}>
                   {track.albums ? `${track.albums.title} · ${track.albums.type}` : "No release"}
                 </div>
               </div>
-              <span style={{ color: "var(--cream-muted)", fontVariantNumeric: "tabular-nums", fontSize: "0.875rem" }}>
+              <span style={{ color: "var(--vynl-texte-2)", fontVariantNumeric: "tabular-nums", fontSize: "0.875rem" }}>
                 {formatDuration(track.duration_seconds)}
               </span>
               <StatusBadge status={track.status} />
@@ -110,12 +109,3 @@ export function TracksList({ tracks }: { tracks: Track[] }) {
     </div>
   );
 }
-
-const rowStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "var(--space-sm)",
-  padding: "0.65rem var(--space-sm)",
-  borderRadius: "var(--radius-sm)",
-  border: "1px solid var(--line)",
-};

@@ -1,10 +1,10 @@
-// Même vocabulaire visuel que le badge "Live"/"Coming" de vynl.com/creators.html :
-// contour plein + point plein pour ce qui est acté, contour pointillé + point
-// creux pour ce qui ne l'est pas (encore, ou plus).
+// Statut d'un morceau ou d'une release. Couleurs fonctionnelles de la DA :
+// succès pour ce qui est en ligne, alerte pour ce qui attend une relecture,
+// neutre pour un brouillon, pointillé pour ce qui est archivé.
 const VARIANTS: Record<string, string> = {
-  draft: "status--soon",
-  in_review: "status--copper",
-  published: "status--live",
+  draft: "status--idle",
+  in_review: "status--warn",
+  published: "status--ok",
   archived: "status--soon",
 };
 

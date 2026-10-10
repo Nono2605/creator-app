@@ -8,17 +8,17 @@ export function BreakdownBars({ items }: { items: { label: string; count: number
           <span style={{ width: 110, flex: "none", fontSize: "0.875rem", textTransform: "capitalize" }}>
             {item.label.replace("_", " ")}
           </span>
-          <div style={{ flex: 1, height: 8, borderRadius: 999, background: "var(--line)", overflow: "hidden" }}>
+          <div style={{ flex: 1, height: 8, borderRadius: 999, background: "var(--vynl-bordure)", overflow: "hidden" }}>
             <div
               style={{
                 width: `${(item.count / max) * 100}%`,
                 height: "100%",
-                background: "var(--copper)",
+                background: "var(--vynl-bleu)",
                 borderRadius: 999,
               }}
             />
           </div>
-          <span style={{ width: 28, flex: "none", textAlign: "right", fontSize: "0.875rem", color: "var(--cream-muted)" }}>
+          <span style={{ width: 28, flex: "none", textAlign: "right", fontSize: "0.875rem", color: "var(--vynl-texte-2)" }}>
             {item.count}
           </span>
         </div>

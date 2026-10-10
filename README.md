@@ -39,6 +39,22 @@ le port 3000).
 5. `/tracks/[id]` — édite le titre, gère les fichiers, transitionne le
    statut (`draft` → `in_review` → `archived`). Le passage à `published`
    est réservé à la modération admin, hors périmètre de cette app.
+   Une fois publié, le morceau affiche ses statistiques d'écoute.
+6. `/`, `/audience`, `/analytics` — statistiques de lecture sur 7, 30 ou
+   90 jours (`?range=`) : écoutes, auditeurs, temps d'écoute, sauvegardes,
+   followers, top morceaux, origine des écoutes, pays et appareils. Elles
+   viennent de `GET /creator/stats`. Tant que la migration SQL
+   `20261010000000_creator_stats.sql` n'est pas appliquée côté base, ces
+   pages affichent « Coming » au lieu des graphiques.
+
+## Tests
+
+```bash
+npm test
+```
+
+Fonctions pures de `src/lib` (formatage, échelles des graphiques, variations,
+série des followers), via `node --test` : Node 22.18 ou plus récent.
 
 ## Backend
 

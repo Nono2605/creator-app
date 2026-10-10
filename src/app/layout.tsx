@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Fraunces, IBM_Plex_Sans } from "next/font/google";
+import { Dela_Gothic_One, Sora } from "next/font/google";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// Dela Gothic One : logo et grands titres d'impact uniquement. Sora : tout le
+// reste. Les deux sont exposées en variables CSS, lues dans globals.css.
+const delaGothic = Dela_Gothic_One({
+  weight: "400",
+  variable: "--font-dela-gothic",
   subsets: ["latin"],
-  weight: "variable",
-  style: ["normal", "italic"],
 });
 
-const ibmPlexSans = IBM_Plex_Sans({
-  variable: "--font-ibm-plex-sans",
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 // (login, signup, onboarding) restent volontairement sans chrome partagé.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${ibmPlexSans.variable}`}>
+    <html lang="en" className={`${delaGothic.variable} ${sora.variable}`}>
       <body>{children}</body>
     </html>
   );

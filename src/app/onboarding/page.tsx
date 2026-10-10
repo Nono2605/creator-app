@@ -22,7 +22,7 @@ export default async function OnboardingPage() {
 
   if (me.role !== "creator" && me.role !== "admin") {
     return (
-      <div style={wrapperStyle}>
+      <div className="bg-signature" style={wrapperStyle}>
         <div style={logoStyle}>
           <Logo />
         </div>
@@ -48,7 +48,7 @@ export default async function OnboardingPage() {
   if (artist) redirect("/tracks");
 
   return (
-    <div style={wrapperStyle}>
+    <div className="bg-signature" style={wrapperStyle}>
       <div style={logoStyle}>
         <Logo />
       </div>
@@ -61,12 +61,12 @@ export default async function OnboardingPage() {
 
 function ErrorNotice({ message }: { message: string }) {
   return (
-    <div style={wrapperStyle}>
+    <div className="bg-signature" style={wrapperStyle}>
       <div style={logoStyle}>
         <Logo />
       </div>
       <h1 style={titleStyle}>Something went wrong</h1>
-      <p style={{ color: "var(--danger)" }}>{message}</p>
+      <p style={{ color: "var(--vynl-erreur)" }}>{message}</p>
     </div>
   );
 }
@@ -81,12 +81,16 @@ const logoStyle: React.CSSProperties = {
   marginBottom: "var(--space-lg)",
 };
 
+// Titres d'impact (texte fixe, jamais saisi par l'utilisateur) : Dela Gothic One.
 const titleStyle: React.CSSProperties = {
-  fontSize: "1.75rem",
+  fontFamily: "var(--vynl-police-marque)",
+  fontWeight: 400,
+  fontSize: "2rem",
+  lineHeight: 1.2,
   marginBottom: "var(--space-sm)",
 };
 
 const subtitleStyle: React.CSSProperties = {
-  color: "var(--cream-muted)",
+  color: "var(--vynl-texte-2)",
   marginBottom: "var(--space-md)",
 };

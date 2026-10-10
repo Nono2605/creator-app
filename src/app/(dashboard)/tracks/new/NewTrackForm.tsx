@@ -64,7 +64,7 @@ export function NewTrackForm() {
         onChange={(e) => setTitle(e.target.value)}
         className="input-field"
       />
-      <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--cream-muted)" }}>
+      <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--vynl-texte-2)" }}>
         <input type="checkbox" checked={explicit} onChange={(e) => setExplicit(e.target.checked)} />
         Explicit content
       </label>
@@ -72,9 +72,9 @@ export function NewTrackForm() {
         type="file"
         accept="audio/*"
         onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-        style={{ color: "var(--cream-muted)" }}
+        style={{ color: "var(--vynl-texte-2)" }}
       />
-      {error && <p style={{ color: "var(--danger)" }}>{error}</p>}
+      {error && <p style={{ color: "var(--vynl-erreur)" }}>{error}</p>}
       <button type="submit" disabled={pending} className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
         {pending ? status ?? "Saving…" : "Create track"}
       </button>

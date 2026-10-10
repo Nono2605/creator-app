@@ -4,15 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/Logo";
 
-// Mêmes glyphes que les cartes de vynl.com/creators.html (Music, Releases,
-// Audience, Analytics, Revenue & wallet) — traits fins, pas d'emoji.
+// Icônes de la DA : style trait, 1,75 px, bouts arrondis, pas d'emoji. Mêmes
+// glyphes que les cartes de vynl.com/creators.html.
 const ICONS = {
   overview: (
     <svg viewBox="0 0 24 24" className="icon" aria-hidden="true">
-      <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
-      <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
-      <rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
-      <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
+      <rect x="3.5" y="3.5" width="7" height="7" rx="2" />
+      <rect x="13.5" y="3.5" width="7" height="7" rx="2" />
+      <rect x="3.5" y="13.5" width="7" height="7" rx="2" />
+      <rect x="13.5" y="13.5" width="7" height="7" rx="2" />
     </svg>
   ),
   music: (
@@ -53,36 +53,46 @@ const ICONS = {
   ),
   wallet: (
     <svg viewBox="0 0 24 24" className="icon" aria-hidden="true">
-      <rect x="3" y="6.5" width="18" height="12" rx="2" />
+      <rect x="3" y="6.5" width="18" height="12" rx="3" />
       <path d="M3 10h18" />
       <circle cx="16.5" cy="14.5" r="1" fill="currentColor" stroke="none" />
     </svg>
   ),
 } as const;
 
+// Sur mobile la barre du bas est limitée à 5 icônes (DA) : les deux pages
+// « Coming » restent accessibles sur desktop uniquement.
 const NAV_ITEMS = [
-  { href: "/", label: "Overview", icon: ICONS.overview },
-  { href: "/tracks", label: "Music", icon: ICONS.music },
-  { href: "/releases", label: "Releases", icon: ICONS.releases },
-  { href: "/audience", label: "Audience", icon: ICONS.audience },
-  { href: "/analytics", label: "Analytics", icon: ICONS.analytics },
-  { href: "/revenue", label: "Revenue", icon: ICONS.revenue },
-  { href: "/wallet", label: "Wallet", icon: ICONS.wallet },
+  { href: "/", label: "Overview", icon: ICONS.overview, desktopOnly: false },
+  { href: "/tracks", label: "Music", icon: ICONS.music, desktopOnly: false },
+  { href: "/releases", label: "Releases", icon: ICONS.releases, desktopOnly: false },
+  { href: "/audience", label: "Audience", icon: ICONS.audience, desktopOnly: false },
+  { href: "/analytics", label: "Analytics", icon: ICONS.analytics, desktopOnly: false },
+  { href: "/revenue", label: "Revenue", icon: ICONS.revenue, desktopOnly: true },
+  { href: "/wallet", label: "Wallet", icon: ICONS.wallet, desktopOnly: true },
 ] as const;
 
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <nav style={navStyle}>
-      <Link href="/" style={brandStyle}>
+    <nav className="sidebar" aria-label="Creator Studio">
+      <Link href="/" className="sidebar__brand" aria-label="Vynl Creator Studio — overview">
         <Logo />
+        <span className="sidebar__tag">Creator Studio</span>
       </Link>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+      <div className="sidebar__links">
         {NAV_ITEMS.map((item) => {
           const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+          const classes = [
+            "sidebar-link",
+            isActive ? "active" : "",
+            item.desktopOnly ? "sidebar-link--desktop-only" : "",
+          ]
+            .filter(Boolean)
+            .join(" ");
           return (
-            <Link key={item.href} href={item.href} className={`sidebar-link${isActive ? " active" : ""}`}>
+            <Link key={item.href} href={item.href} className={classes} aria-current={isActive ? "page" : undefined}>
               {item.icon}
               {item.label}
             </Link>
@@ -92,19 +102,3 @@ export function Sidebar() {
     </nav>
   );
 }
-
-const navStyle: React.CSSProperties = {
-  width: "var(--sidebar-width)",
-  flex: "none",
-  padding: "var(--space-md) var(--space-sm)",
-  display: "flex",
-  flexDirection: "column",
-  gap: "var(--space-md)",
-  borderRight: "1px solid var(--line)",
-  background: "var(--surface)",
-};
-
-const brandStyle: React.CSSProperties = {
-  padding: "0 0.85rem",
-  color: "var(--cream)",
-};

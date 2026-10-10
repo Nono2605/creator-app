@@ -14,7 +14,7 @@ export default async function TracksPage() {
       <div style={headerRowStyle}>
         <div>
           <h1 style={{ fontSize: "1.75rem" }}>Music</h1>
-          <p style={{ color: "var(--cream-muted)" }}>{artist.name}</p>
+          <p style={{ color: "var(--vynl-texte-2)" }}>{artist.name}</p>
         </div>
         <Link href="/tracks/new" className="btn btn-primary">
           New track

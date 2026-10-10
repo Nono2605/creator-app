@@ -1,8 +1,16 @@
 import { notFound } from "next/navigation";
 import { requireArtist } from "@/lib/session";
 import { api } from "@/lib/api";
+import { dailySeries, hasNoListens, loadStats, parseRange } from "@/lib/stats";
+import { computeDelta, formatCount, formatListeningTime, previousRangeLabel } from "@/lib/formatStats";
+import { sourceLabel } from "@/lib/statsLabels";
 import { StatusBadge } from "@/components/StatusBadge";
 import { AIDeclarationForm } from "@/components/AIDeclarationForm";
+import { StatTile } from "@/components/StatTile";
+import { RangeFilter } from "@/components/RangeFilter";
+import { TimeSeriesChart } from "@/components/TimeSeriesChart";
+import { BarList } from "@/components/BarList";
+import { NoListens, StatsNotice } from "@/components/StatsNotice";
 import {
   updateTrackStatus,
   deleteTrackAction,
@@ -39,8 +47,15 @@ function formatBytes(bytes: number | null): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export default async function TrackPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function TrackPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ range?: string | string[] }>;
+}) {
   const { id } = await params;
+  const range = parseRange((await searchParams).range);
   const { session } = await requireArtist();
 
   let track: Track;
@@ -61,6 +76,12 @@ export default async function TrackPage({ params }: { params: Promise<{ id: stri
     declaration = null;
   }
 
+  // Écoutes de ce morceau : seulement une fois publié (un brouillon n'en a pas).
+  // Ne lève jamais, comme la déclaration ci-dessus.
+  const showStats = track.status === "published" || track.status === "archived";
+  const stats = showStats ? await loadStats(session.access_token, range, track.id) : null;
+  const comparedTo = previousRangeLabel(range);
+
   return (
     <div style={{ maxWidth: 640, display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)" }}>
@@ -75,19 +96,82 @@ export default async function TrackPage({ params }: { params: Promise<{ id: stri
         </button>
       </form>
 
+      {stats && (
+        <section style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
+          <div className="card-head" style={{ marginBottom: 0, flexWrap: "wrap" }}>
+            <h2 style={{ fontSize: "1.375rem" }}>Listening</h2>
+            <RangeFilter basePath={`/tracks/${track.id}`} current={range} />
+          </div>
+
+          {stats.status !== "ok" ? (
+            <StatsNotice result={stats} />
+          ) : hasNoListens(stats.stats) ? (
+            <NoListens />
+          ) : (
+            <>
+              <div className="stat-grid">
+                <StatTile
+                  featured
+                  label="Listens"
+                  value={formatCount(stats.stats.totals.plays)}
+                  delta={computeDelta(stats.stats.totals.plays, stats.stats.previous.plays)}
+                  comparedTo={comparedTo}
+                />
+                <StatTile
+                  label="Listeners"
+                  value={formatCount(stats.stats.totals.listeners)}
+                  delta={computeDelta(stats.stats.totals.listeners, stats.stats.previous.listeners)}
+                  comparedTo={comparedTo}
+                />
+                <StatTile
+                  label="Listening time"
+                  value={formatListeningTime(stats.stats.totals.seconds)}
+                  delta={computeDelta(stats.stats.totals.seconds, stats.stats.previous.seconds)}
+                  comparedTo={comparedTo}
+                />
+                <StatTile
+                  label="Saves"
+                  value={formatCount(stats.stats.totals.saves)}
+                  delta={computeDelta(stats.stats.totals.saves, stats.stats.previous.saves)}
+                  comparedTo={comparedTo}
+                />
+              </div>
+
+              <div className="dash-card">
+                <TimeSeriesChart series={dailySeries(stats.stats.daily)} label={`Daily listening — ${track.title}`} />
+              </div>
+
+              <div className="dash-card">
+                <h3 className="section-title">How listeners find this track</h3>
+                <BarList
+                  total={stats.stats.totals.plays}
+                  unit="listens"
+                  rows={stats.stats.breakdown.source.map((r) => ({
+                    key: r.key,
+                    label: sourceLabel(r.key),
+                    value: r.plays,
+                    muted: r.key === "unknown" || r.key === "other",
+                  }))}
+                />
+              </div>
+            </>
+          )}
+        </section>
+      )}
+
       <section className="dash-card">
         <h2 className="section-title">Audio files</h2>
         {track.files.length === 0 ? (
-          <p style={{ color: "var(--cream-muted)" }}>No audio file uploaded yet.</p>
+          <p style={{ color: "var(--vynl-texte-2)" }}>No audio file uploaded yet.</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             {track.files.map((file) => (
-              <div key={file.id} className="list-row" style={fileRowStyle}>
+              <div key={file.id} className="list-row" style={{ justifyContent: "space-between" }}>
                 <span>
                   {file.format.toUpperCase()} · {formatBytes(file.file_size_bytes)}
                 </span>
                 <form action={removeFile.bind(null, track.id, file.id)}>
-                  <button type="submit" className="btn-plain" style={{ color: "var(--danger)" }}>
+                  <button type="submit" className="btn-plain" style={{ color: "var(--vynl-erreur)" }}>
                     Remove
                   </button>
                 </form>
@@ -139,12 +223,3 @@ export default async function TrackPage({ params }: { params: Promise<{ id: stri
     </div>
   );
 }
-
-const fileRowStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: "0.6rem var(--space-sm)",
-  borderRadius: "var(--radius-sm)",
-  border: "1px solid var(--line)",
-};

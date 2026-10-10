@@ -54,26 +54,31 @@ export function ImageUploadField({
           maxWidth: round ? 96 : 480,
           aspectRatio,
           borderRadius: round ? "50%" : "var(--radius-md)",
-          background: preview ? `url(${preview}) center/cover` : "var(--copper)",
+          background: preview
+            ? `url(${preview}) center/cover`
+            : kind === "banner"
+              ? "var(--vynl-banniere-vide)"
+              : "var(--vynl-pochette-vide)",
+          border: "1px solid var(--vynl-bordure)",
           marginBottom: "0.5rem",
         }}
       />
       <input type="file" accept="image/*" onChange={handleChange} disabled={pending} />
       {pending && <p style={hintStyle}>Uploading…</p>}
-      {error && <p style={{ ...hintStyle, color: "var(--danger)" }}>{error}</p>}
+      {error && <p style={{ ...hintStyle, color: "var(--vynl-erreur)" }}>{error}</p>}
     </div>
   );
 }
 
 const labelStyle: React.CSSProperties = {
   fontSize: "0.8125rem",
-  color: "var(--cream-muted)",
+  color: "var(--vynl-texte-2)",
   display: "block",
   marginBottom: "0.5rem",
 };
 
 const hintStyle: React.CSSProperties = {
   fontSize: "0.8125rem",
-  color: "var(--cream-muted)",
+  color: "var(--vynl-texte-2)",
   marginTop: "0.35rem",
 };

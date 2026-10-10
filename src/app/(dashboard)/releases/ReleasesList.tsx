@@ -56,7 +56,7 @@ export function ReleasesList({ releases }: { releases: Release[] }) {
   if (releases.length === 0) {
     return (
       <div className="dash-card">
-        <p style={{ color: "var(--cream-muted)" }}>
+        <p style={{ color: "var(--vynl-texte-2)" }}>
           No releases yet. Group your tracks into an album, EP, or single.
         </p>
       </div>
@@ -66,15 +66,14 @@ export function ReleasesList({ releases }: { releases: Release[] }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "0.5rem" }}>
-        <label htmlFor="release-sort" style={{ fontSize: "0.8125rem", color: "var(--cream-muted)" }}>
+        <label htmlFor="release-sort" style={{ fontSize: "0.8125rem", color: "var(--vynl-texte-2)" }}>
           Sort by
         </label>
         <select
           id="release-sort"
           value={sort}
           onChange={(e) => setSort(e.target.value as SortValue)}
-          className="input-field"
-          style={{ padding: "0.45rem 0.75rem", fontSize: "0.875rem" }}
+          className="input-field input-field--sm"
         >
           {SORT_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -87,7 +86,7 @@ export function ReleasesList({ releases }: { releases: Release[] }) {
       <div className="dash-card">
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           {sortedReleases.map((release) => (
-            <Link key={release.id} href={`/releases/${release.id}`} className="list-row" style={rowStyle}>
+            <Link key={release.id} href={`/releases/${release.id}`} className="list-row">
               <div
                 style={{
                   width: 36,
@@ -96,11 +95,11 @@ export function ReleasesList({ releases }: { releases: Release[] }) {
                   borderRadius: "var(--radius-sm)",
                   background: release.cover_url
                     ? `url(${release.cover_url}) center/cover`
-                    : "var(--copper)",
+                    : "var(--vynl-pochette-vide)",
                 }}
               />
-              <span style={{ flex: 1 }}>{release.title}</span>
-              <span style={{ color: "var(--cream-muted)", fontSize: "0.8125rem", textTransform: "capitalize" }}>
+              <span className="list-row__main">{release.title}</span>
+              <span style={{ color: "var(--vynl-texte-2)", fontSize: "0.8125rem", textTransform: "capitalize" }}>
                 {release.type}
               </span>
               <StatusBadge status={release.status} />
@@ -111,12 +110,3 @@ export function ReleasesList({ releases }: { releases: Release[] }) {
     </div>
   );
 }
-
-const rowStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "var(--space-sm)",
-  padding: "0.65rem var(--space-sm)",
-  borderRadius: "var(--radius-sm)",
-  border: "1px solid var(--line)",
-};

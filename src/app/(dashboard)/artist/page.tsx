@@ -7,7 +7,7 @@ export default async function ArtistProfilePage() {
   return (
     <div style={{ maxWidth: 640 }}>
       <h1 style={{ fontSize: "1.75rem" }}>{artist.name}</h1>
-      <p style={{ color: "var(--cream-muted)", marginBottom: "var(--space-lg)" }}>
+      <p style={{ color: "var(--vynl-texte-2)", marginBottom: "var(--space-lg)" }}>
         This is the public identity shown on your artist page.
       </p>
       <ArtistProfileForm artist={artist} />

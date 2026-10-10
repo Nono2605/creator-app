@@ -16,7 +16,7 @@ export function ApplyForm() {
     <form action={action} style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
       <div style={termsBoxStyle}>
         <p style={{ fontWeight: 600, marginBottom: "0.5rem" }}>Creator Terms of Service</p>
-        <p style={{ color: "var(--cream-muted)", fontSize: "0.875rem" }}>
+        <p style={{ color: "var(--vynl-texte-2)", fontSize: "0.875rem" }}>
           Placeholder — final text to come. By using creator features you agree to only upload
           content you have the rights to, to accurately declare how it was produced, and to
           comply with our content and royalties policies once published.
@@ -43,13 +43,13 @@ export function ApplyForm() {
       </label>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-        <label htmlFor="primary_genre" style={{ color: "var(--cream-muted)", fontSize: "0.875rem" }}>
+        <label htmlFor="primary_genre" style={{ color: "var(--vynl-texte-2)", fontSize: "0.875rem" }}>
           Primary genre (optional)
         </label>
         <input id="primary_genre" name="primary_genre" type="text" className="input-field" />
       </div>
 
-      {state?.error && <p style={{ color: "var(--danger)" }}>{state.error}</p>}
+      {state?.error && <p style={{ color: "var(--vynl-erreur)" }}>{state.error}</p>}
       <button type="submit" disabled={pending} className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
         {pending ? "Enabling…" : "Enable creator mode"}
       </button>
@@ -60,8 +60,8 @@ export function ApplyForm() {
 const termsBoxStyle: React.CSSProperties = {
   padding: "var(--space-sm) var(--space-md)",
   borderRadius: "var(--radius-sm)",
-  border: "1px solid var(--line)",
-  background: "var(--surface)",
+  border: "1px solid var(--vynl-bordure)",
+  background: "var(--vynl-vinyle)",
   maxHeight: 160,
   overflowY: "auto",
 };
@@ -73,7 +73,7 @@ const checkboxRowStyle: React.CSSProperties = {
 };
 
 const fieldsetStyle: React.CSSProperties = {
-  border: "1px solid var(--line)",
+  border: "1px solid var(--vynl-bordure)",
   borderRadius: "var(--radius-sm)",
   padding: "var(--space-sm) var(--space-md)",
   display: "flex",
@@ -83,6 +83,6 @@ const fieldsetStyle: React.CSSProperties = {
 
 const legendStyle: React.CSSProperties = {
   padding: "0 0.35rem",
-  color: "var(--cream-muted)",
+  color: "var(--vynl-texte-2)",
   fontSize: "0.875rem",
 };
