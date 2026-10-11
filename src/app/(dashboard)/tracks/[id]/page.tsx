@@ -6,6 +6,7 @@ import { computeDelta, formatCount, formatListeningTime, previousRangeLabel } fr
 import { sourceLabel } from "@/lib/statsLabels";
 import { StatusBadge } from "@/components/StatusBadge";
 import { AIDeclarationForm } from "@/components/AIDeclarationForm";
+import { AudioUploadField } from "@/components/AudioUploadField";
 import { StatTile } from "@/components/StatTile";
 import { RangeFilter } from "@/components/RangeFilter";
 import { TimeSeriesChart } from "@/components/TimeSeriesChart";
@@ -162,7 +163,20 @@ export default async function TrackPage({
       <section className="dash-card">
         <h2 className="section-title">Audio files</h2>
         {track.files.length === 0 ? (
-          <p style={{ color: "var(--vynl-texte-2)" }}>No audio file uploaded yet.</p>
+          track.status === "draft" ? (
+            // Un brouillon peut être créé sans fichier (ou l'envoi peut avoir échoué) : on
+            // peut toujours l'ajouter ici. Sans audio, le morceau ne peut pas partir en relecture.
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
+              <p style={{ color: "var(--vynl-texte-2)" }}>
+                No audio yet. Add the file to be able to submit this track for review.
+              </p>
+              <AudioUploadField trackId={track.id} />
+            </div>
+          ) : (
+            <p style={{ color: "var(--vynl-texte-2)" }}>
+              No audio file. Withdraw the track to draft to add one.
+            </p>
+          )
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             {track.files.map((file) => (
@@ -191,13 +205,24 @@ export default async function TrackPage({
       </section>
 
       <section style={{ display: "flex", gap: "var(--space-sm)", flexWrap: "wrap" }}>
-        {track.status === "draft" && (
-          <form action={updateTrackStatus.bind(null, track.id, "in_review")}>
-            <button type="submit" className="btn btn-primary">
-              Submit for review
-            </button>
-          </form>
-        )}
+        {track.status === "draft" &&
+          (track.files.length === 0 ? (
+            // Sans audio il n'y a rien à relire : l'API refuse aussi ; ici on explique avant le clic.
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+              <button type="button" className="btn btn-primary" disabled aria-describedby="review-blocker">
+                Submit for review
+              </button>
+              <span id="review-blocker" style={{ color: "var(--vynl-texte-2)", fontSize: "0.8125rem" }}>
+                Add the audio file first.
+              </span>
+            </div>
+          ) : (
+            <form action={updateTrackStatus.bind(null, track.id, "in_review")}>
+              <button type="submit" className="btn btn-primary">
+                Submit for review
+              </button>
+            </form>
+          ))}
         {track.status === "in_review" && (
           <form action={updateTrackStatus.bind(null, track.id, "draft")}>
             <button type="submit" className="btn btn-secondary">

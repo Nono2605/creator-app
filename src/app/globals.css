@@ -316,6 +316,10 @@ input[type="radio"] {
 .text-link:hover {
   text-decoration: underline;
 }
+/* Lien qui garde la couleur du texte et se souligne au survol (titres dans une liste). */
+.hover-underline:hover {
+  text-decoration: underline;
+}
 
 .input-field {
   min-height: 44px;

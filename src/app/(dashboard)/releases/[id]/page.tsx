@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireArtist } from "@/lib/session";
 import { api } from "@/lib/api";
@@ -58,6 +59,16 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
     availableTracks = [];
   }
 
+  // Une release ne part en relecture qu'avec au moins un morceau, et de l'audio sur chacun
+  // (la durée n'est connue qu'une fois le fichier audio mesuré).
+  const withoutAudio = release.tracks.filter((t) => t.duration_seconds === null).length;
+  const reviewBlocker =
+    release.tracks.length === 0
+      ? "Add at least one track first."
+      : withoutAudio > 0
+        ? `${withoutAudio} ${withoutAudio === 1 ? "track still needs" : "tracks still need"} an audio file.`
+        : null;
+
   return (
     <div style={{ maxWidth: 640, display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", flexWrap: "wrap" }}>
@@ -77,7 +88,18 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
                 <span style={{ color: "var(--vynl-texte-2)", width: 20, textAlign: "right" }}>
                   {track.track_number ?? index + 1}
                 </span>
-                <span className="list-row__main">{track.title}</span>
+                {/* Le titre mène à la page du morceau (audio, déclaration IA). La durée est
+                    lue dans le fichier audio : sans elle, le morceau n'a pas encore d'audio. */}
+                <span className="list-row__main">
+                  <Link href={`/tracks/${track.id}`} className="hover-underline">
+                    {track.title}
+                  </Link>
+                  {track.duration_seconds === null && (
+                    <Link href={`/tracks/${track.id}`} className="status status--warn" style={{ marginLeft: "0.5rem" }}>
+                      No audio
+                    </Link>
+                  )}
+                </span>
                 <StatusBadge status={track.status} />
                 <span style={{ color: "var(--vynl-texte-2)", fontVariantNumeric: "tabular-nums" }}>
                   {formatDuration(track.duration_seconds)}
@@ -113,13 +135,24 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
       )}
 
       <section style={{ display: "flex", gap: "var(--space-sm)", flexWrap: "wrap" }}>
-        {release.status === "draft" && (
-          <form action={updateReleaseStatus.bind(null, release.id, "in_review")}>
-            <button type="submit" className="btn btn-primary">
-              Submit for review
-            </button>
-          </form>
-        )}
+        {release.status === "draft" &&
+          (reviewBlocker ? (
+            // Mêmes conditions que l'API : au moins un morceau, et de l'audio sur chacun.
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+              <button type="button" className="btn btn-primary" disabled aria-describedby="review-blocker">
+                Submit for review
+              </button>
+              <span id="review-blocker" style={{ color: "var(--vynl-texte-2)", fontSize: "0.8125rem" }}>
+                {reviewBlocker}
+              </span>
+            </div>
+          ) : (
+            <form action={updateReleaseStatus.bind(null, release.id, "in_review")}>
+              <button type="submit" className="btn btn-primary">
+                Submit for review
+              </button>
+            </form>
+          ))}
         {release.status === "in_review" && (
           <form action={updateReleaseStatus.bind(null, release.id, "draft")}>
             <button type="submit" className="btn btn-secondary">

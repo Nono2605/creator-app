@@ -47,29 +47,46 @@ export interface UploadUrl {
   signedUrl: string;
 }
 
-export async function getUploadUrl(trackId: string, filename: string): Promise<UploadUrl> {
+// Les deux actions suivantes RENVOIENT leur échec au lieu de le lever : en production,
+// Next masque le message d'une erreur levée par une Server Action, et le créateur ne
+// verrait qu'une erreur générique au lieu de « ce fichier n'est pas de l'audio ».
+export type UploadUrlResult = { ok: true; path: string; token: string } | { ok: false; error: string };
+
+export async function getUploadUrl(trackId: string, filename: string): Promise<UploadUrlResult> {
   const token = await accessToken();
-  return api.post<UploadUrl>(
-    `/creator/tracks/${trackId}/upload-url`,
-    { filename },
-    { accessToken: token }
-  );
+  try {
+    const res = await api.post<UploadUrl>(
+      `/creator/tracks/${trackId}/upload-url`,
+      { filename },
+      { accessToken: token }
+    );
+    return { ok: true, path: res.path, token: res.token };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Could not prepare the upload." };
+  }
 }
+
+export type AttachFileResult = { ok: true } | { ok: false; error: string };
 
 export async function attachFile(
   trackId: string,
   path: string,
   format: string,
   fileSizeBytes: number
-): Promise<void> {
+): Promise<AttachFileResult> {
   const token = await accessToken();
-  await api.post(
-    `/creator/tracks/${trackId}/files`,
-    { path, format, file_size_bytes: fileSizeBytes },
-    { accessToken: token }
-  );
+  try {
+    await api.post(
+      `/creator/tracks/${trackId}/files`,
+      { path, format, file_size_bytes: fileSizeBytes },
+      { accessToken: token }
+    );
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "The file could not be checked." };
+  }
   revalidatePath(`/tracks/${trackId}`);
   revalidatePath("/tracks");
+  return { ok: true };
 }
 
 export async function updateTrackStatus(trackId: string, status: string): Promise<void> {

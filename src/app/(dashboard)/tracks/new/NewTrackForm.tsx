@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { createTrackAction, getUploadUrl, attachFile } from "@/app/actions/tracks";
+import { createTrackAction } from "@/app/actions/tracks";
+import { uploadAudio } from "@/lib/uploadAudio";
 
 export function NewTrackForm() {
   const router = useRouter();
@@ -12,6 +13,9 @@ export function NewTrackForm() {
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Le brouillon créé avant un envoi raté : on le garde pour réessayer SUR LUI, au lieu
+  // d'en créer un deuxième à chaque tentative.
+  const [draftId, setDraftId] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -20,29 +24,30 @@ export function NewTrackForm() {
     setPending(true);
 
     try {
-      const formData = new FormData();
-      formData.set("title", title);
-      if (explicit) formData.set("explicit", "on");
+      let trackId = draftId;
+      if (!trackId) {
+        const formData = new FormData();
+        formData.set("title", title);
+        if (explicit) formData.set("explicit", "on");
 
-      const result = await createTrackAction(undefined, formData);
-      if (result.error || !result.trackId) {
-        setError(result.error ?? "Could not create track.");
-        return;
+        const result = await createTrackAction(undefined, formData);
+        if (result.error || !result.trackId) {
+          setError(result.error ?? "Could not create track.");
+          return;
+        }
+        trackId = result.trackId;
+        setDraftId(trackId);
       }
-      const trackId = result.trackId;
 
       if (file) {
-        setStatus("Uploading audio…");
-        const { path, token } = await getUploadUrl(trackId, file.name);
-
-        const supabase = createClient();
-        const { error: uploadError } = await supabase.storage
-          .from("track-audio")
-          .uploadToSignedUrl(path, token, file);
-        if (uploadError) throw uploadError;
-
-        const format = file.name.includes(".") ? file.name.split(".").pop()! : "unknown";
-        await attachFile(trackId, path, format, file.size);
+        const uploaded = await uploadAudio(trackId, file, (phase) =>
+          setStatus(phase === "uploading" ? "Uploading audio…" : "Checking the file…")
+        );
+        if (!uploaded.ok) {
+          // Le brouillon existe déjà : on le dit, et la page du morceau permet d'ajouter l'audio.
+          setError(uploaded.error);
+          return;
+        }
       }
 
       router.push(`/tracks/${trackId}`);
@@ -75,8 +80,17 @@ export function NewTrackForm() {
         style={{ color: "var(--vynl-texte-2)" }}
       />
       {error && <p style={{ color: "var(--vynl-erreur)" }}>{error}</p>}
+      {draftId && error && (
+        <p style={{ color: "var(--vynl-texte-2)", fontSize: "0.875rem" }}>
+          Your draft was saved without audio. Choose the file again and retry, or{" "}
+          <Link href={`/tracks/${draftId}`} className="text-link">
+            open the draft
+          </Link>{" "}
+          and add the audio there.
+        </p>
+      )}
       <button type="submit" disabled={pending} className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
-        {pending ? status ?? "Saving…" : "Create track"}
+        {pending ? status ?? "Saving…" : draftId ? "Retry upload" : "Create track"}
       </button>
     </form>
   );
