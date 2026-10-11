@@ -4,6 +4,7 @@ import { requireArtist } from "@/lib/session";
 import { api } from "@/lib/api";
 import { StatusBadge } from "@/components/StatusBadge";
 import { formatDuration } from "@/lib/formatDuration";
+import { CatalogCode } from "@/components/CatalogCode";
 import {
   updateReleaseStatus,
   deleteReleaseAction,
@@ -13,6 +14,7 @@ import {
 
 interface ReleaseTrack {
   id: string;
+  catalog_code?: string | null;
   title: string;
   status: string;
   track_number: number | null;
@@ -21,6 +23,7 @@ interface ReleaseTrack {
 
 interface Release {
   id: string;
+  catalog_code?: string | null;
   title: string;
   type: string;
   status: string;
@@ -76,6 +79,9 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
         <StatusBadge status={release.status} />
         <span style={{ color: "var(--vynl-texte-2)", textTransform: "capitalize" }}>{release.type}</span>
       </div>
+      <p style={{ marginTop: "calc(var(--space-sm) * -1)" }}>
+        <CatalogCode code={release.catalog_code} label="Catalog number" />
+      </p>
 
       <section className="dash-card">
         <h2 className="section-title">Tracks</h2>
@@ -94,6 +100,11 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
                   <Link href={`/tracks/${track.id}`} className="hover-underline">
                     {track.title}
                   </Link>
+                  {track.catalog_code && (
+                    <span style={{ display: "block", fontSize: "0.75rem", color: "var(--vynl-texte-2)" }}>
+                      {track.catalog_code}
+                    </span>
+                  )}
                   {track.duration_seconds === null && (
                     <Link href={`/tracks/${track.id}`} className="status status--warn" style={{ marginLeft: "0.5rem" }}>
                       No audio

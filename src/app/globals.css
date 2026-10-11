@@ -316,6 +316,21 @@ input[type="radio"] {
 .text-link:hover {
   text-decoration: underline;
 }
+/* Numéro de catalogue (VYN-T-000005) : discret, chiffres à chasse fixe pour s'aligner. */
+.catalog-code {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  color: var(--vynl-texte-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.catalog-code__label {
+  color: var(--vynl-texte-3);
+  font-weight: 400;
+}
 /* Lien qui garde la couleur du texte et se souligne au survol (titres dans une liste). */
 .hover-underline:hover {
   text-decoration: underline;

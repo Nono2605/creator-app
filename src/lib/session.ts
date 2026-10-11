@@ -12,6 +12,8 @@ export interface Me {
 
 export interface Artist {
   id: string;
+  /** Numéro permanent, ex. VYN-A-000003 (voir la migration des numéros de catalogue). */
+  catalog_code?: string | null;
   name: string;
   slug: string;
   bio: string | null;

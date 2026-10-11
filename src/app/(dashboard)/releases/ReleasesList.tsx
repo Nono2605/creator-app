@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 
 export interface Release {
   id: string;
+  catalog_code?: string | null;
   title: string;
   type: string;
   status: string;
@@ -98,7 +99,14 @@ export function ReleasesList({ releases }: { releases: Release[] }) {
                     : "var(--vynl-pochette-vide)",
                 }}
               />
-              <span className="list-row__main">{release.title}</span>
+              <span className="list-row__main">
+                {release.title}
+                {release.catalog_code && (
+                  <span style={{ display: "block", fontSize: "0.75rem", color: "var(--vynl-texte-2)" }}>
+                    {release.catalog_code}
+                  </span>
+                )}
+              </span>
               <span style={{ color: "var(--vynl-texte-2)", fontSize: "0.8125rem", textTransform: "capitalize" }}>
                 {release.type}
               </span>

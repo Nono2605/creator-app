@@ -7,6 +7,7 @@ import { sourceLabel } from "@/lib/statsLabels";
 import { StatusBadge } from "@/components/StatusBadge";
 import { AIDeclarationForm } from "@/components/AIDeclarationForm";
 import { AudioUploadField } from "@/components/AudioUploadField";
+import { CatalogCode } from "@/components/CatalogCode";
 import { StatTile } from "@/components/StatTile";
 import { RangeFilter } from "@/components/RangeFilter";
 import { TimeSeriesChart } from "@/components/TimeSeriesChart";
@@ -28,6 +29,8 @@ interface TrackFile {
 
 interface Track {
   id: string;
+  catalog_code?: string | null;
+  album_id: string | null;
   title: string;
   slug: string;
   status: string;
@@ -89,6 +92,16 @@ export default async function TrackPage({
         <h1 style={{ fontSize: "1.75rem" }}>{track.title}</h1>
         <StatusBadge status={track.status} />
       </div>
+
+      {/* Le numéro de catalogue est permanent (VYN-T-…). La piste est la position dans la
+          release ; un morceau seul est la piste 1 de lui-même. */}
+      <p style={{ marginTop: "calc(var(--space-sm) * -1)", display: "flex", flexWrap: "wrap", gap: "0.25rem 1rem" }}>
+        <CatalogCode code={track.catalog_code} label="Catalog number" />
+        <span className="catalog-code">
+          <span className="catalog-code__label">{track.album_id ? "Position" : "Release"}</span>
+          {track.album_id ? `Track ${track.track_number ?? 1}` : "Single"}
+        </span>
+      </p>
 
       <form action={updateTrackTitleAction.bind(null, track.id)} style={{ display: "flex", gap: "var(--space-xs)" }}>
         <input name="title" defaultValue={track.title} className="input-field" style={{ flex: 1 }} />

@@ -7,6 +7,7 @@ import { formatDuration } from "@/lib/formatDuration";
 
 export interface Track {
   id: string;
+  catalog_code?: string | null;
   title: string;
   status: string;
   duration_seconds: number | null;
@@ -95,7 +96,8 @@ export function TracksList({ tracks }: { tracks: Track[] }) {
               <div className="list-row__main">
                 <div>{track.title}</div>
                 <div style={{ fontSize: "0.75rem", color: "var(--vynl-texte-2)" }}>
-                  {track.albums ? `${track.albums.title} · ${track.albums.type}` : "No release"}
+                  {track.catalog_code ? `${track.catalog_code} · ` : ""}
+                  {track.albums ? `${track.albums.title} · ${track.albums.type}` : "Single"}
                 </div>
               </div>
               <span style={{ color: "var(--vynl-texte-2)", fontVariantNumeric: "tabular-nums", fontSize: "0.875rem" }}>
