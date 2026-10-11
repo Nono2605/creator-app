@@ -5,6 +5,7 @@ import { api } from "@/lib/api";
 import { StatusBadge } from "@/components/StatusBadge";
 import { formatDuration } from "@/lib/formatDuration";
 import { CatalogCode } from "@/components/CatalogCode";
+import { CoverField } from "./CoverField";
 import {
   updateReleaseStatus,
   deleteReleaseAction,
@@ -82,6 +83,11 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
       <p style={{ marginTop: "calc(var(--space-sm) * -1)" }}>
         <CatalogCode code={release.catalog_code} label="Catalog number" />
       </p>
+
+      <section className="dash-card">
+        <h2 className="section-title">Cover</h2>
+        <CoverField releaseId={release.id} coverUrl={release.cover_url} />
+      </section>
 
       <section className="dash-card">
         <h2 className="section-title">Tracks</h2>

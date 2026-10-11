@@ -4,6 +4,7 @@ import { api } from "@/lib/api";
 import { dailySeries, hasNoListens, loadStats, parseRange } from "@/lib/stats";
 import { computeDelta, formatCount, formatListeningTime, previousRangeLabel } from "@/lib/formatStats";
 import { sourceLabel } from "@/lib/statsLabels";
+import Link from "next/link";
 import { StatusBadge } from "@/components/StatusBadge";
 import { AIDeclarationForm } from "@/components/AIDeclarationForm";
 import { AudioUploadField } from "@/components/AudioUploadField";
@@ -13,6 +14,7 @@ import { RangeFilter } from "@/components/RangeFilter";
 import { TimeSeriesChart } from "@/components/TimeSeriesChart";
 import { BarList } from "@/components/BarList";
 import { NoListens, StatsNotice } from "@/components/StatsNotice";
+import { MakeSingle } from "./MakeSingle";
 import {
   updateTrackStatus,
   deleteTrackAction,
@@ -109,6 +111,20 @@ export default async function TrackPage({
           Rename
         </button>
       </form>
+
+      <section className="dash-card">
+        <h2 className="section-title">Cover</h2>
+        {track.album_id ? (
+          <p style={{ color: "var(--vynl-texte-2)" }}>
+            The cover belongs to the release.{" "}
+            <Link href={`/releases/${track.album_id}`} className="text-link">
+              Edit the cover
+            </Link>
+          </p>
+        ) : (
+          <MakeSingle trackId={track.id} title={track.title} />
+        )}
+      </section>
 
       {stats && (
         <section style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>

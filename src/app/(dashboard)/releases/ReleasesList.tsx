@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { StatusBadge } from "@/components/StatusBadge";
+import { VinylCover } from "@/components/VinylCover";
 
 export interface Release {
   id: string;
@@ -88,17 +89,7 @@ export function ReleasesList({ releases }: { releases: Release[] }) {
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           {sortedReleases.map((release) => (
             <Link key={release.id} href={`/releases/${release.id}`} className="list-row">
-              <div
-                style={{
-                  width: 36,
-                  height: 36,
-                  flex: "none",
-                  borderRadius: "var(--radius-sm)",
-                  background: release.cover_url
-                    ? `url(${release.cover_url}) center/cover`
-                    : "var(--vynl-pochette-vide)",
-                }}
-              />
+              <VinylCover src={release.cover_url} size={36} small style={{ borderRadius: "var(--radius-sm)" }} />
               <span className="list-row__main">
                 {release.title}
                 {release.catalog_code && (

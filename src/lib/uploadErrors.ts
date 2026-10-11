@@ -18,3 +18,16 @@ export function friendlyUploadError(raw: unknown): string {
   }
   return message.trim() || "The upload failed. Please try again.";
 }
+
+// Même chose pour l'envoi d'une pochette : mêmes pannes, mais les conseils parlent d'image,
+// pas d'audio. Le stockage refuse ce qui n'est pas JPEG / PNG / WebP ou dépasse 5 Mo.
+export function friendlyCoverError(raw: unknown): string {
+  const message = raw instanceof Error ? raw.message : typeof raw === "string" ? raw : "";
+  if (/exceeded the maximum allowed size|payload too large|request entity too large|\b413\b/i.test(message)) {
+    return "This image is too large to upload. Export a lighter version.";
+  }
+  if (/mime type|content[- ]type|unsupported media/i.test(message)) {
+    return "This image type isn't accepted. Use a JPEG, PNG or WebP image.";
+  }
+  return friendlyUploadError(raw);
+}

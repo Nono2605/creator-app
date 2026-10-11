@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { friendlyUploadError } from "./uploadErrors.ts";
+import { friendlyCoverError, friendlyUploadError } from "./uploadErrors.ts";
 
 describe("friendlyUploadError", () => {
   it("fichier trop gros (limite du stockage)", () => {
@@ -25,5 +25,19 @@ describe("friendlyUploadError", () => {
     assert.equal(friendlyUploadError(undefined), "The upload failed. Please try again.");
     assert.equal(friendlyUploadError(new Error("  ")), "The upload failed. Please try again.");
     assert.equal(friendlyUploadError({}), "The upload failed. Please try again.");
+  });
+});
+
+describe("friendlyCoverError", () => {
+  it("parle d'image, jamais d'audio", () => {
+    assert.match(friendlyCoverError(new Error("mime type image/gif is not supported")), /JPEG, PNG or WebP/);
+    assert.match(friendlyCoverError("The object exceeded the maximum allowed size"), /too large/);
+    assert.doesNotMatch(friendlyCoverError("Payload too large"), /MP3|audio/i);
+  });
+
+  it("les autres pannes gardent le message commun", () => {
+    assert.match(friendlyCoverError(new Error("Failed to fetch")), /interrupted/);
+    assert.match(friendlyCoverError("Your session expired"), /session expired/i);
+    assert.equal(friendlyCoverError(""), "The upload failed. Please try again.");
   });
 });
