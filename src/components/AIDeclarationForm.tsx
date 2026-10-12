@@ -3,10 +3,11 @@
 import { useState, useTransition } from "react";
 import { declareProvenance } from "@/app/actions/tracks";
 
-type Provenance = "human" | "ai" | "hybrid";
+type Provenance = "ai" | "hybrid";
 
+// « human » n'est plus proposé (la bêta est 100 % IA) ; une ancienne déclaration « human »
+// reste lisible mais doit être refaite.
 const OPTIONS: { value: Provenance; label: string }[] = [
-  { value: "human", label: "Human-made" },
   { value: "hybrid", label: "AI-assisted" },
   { value: "ai", label: "AI-generated" },
 ];
@@ -17,10 +18,12 @@ export function AIDeclarationForm({
   initialDescription,
 }: {
   trackId: string;
-  initialProvenance: Provenance | null;
+  initialProvenance: Provenance | "human" | null;
   initialDescription: string;
 }) {
-  const [provenance, setProvenance] = useState<Provenance | null>(initialProvenance);
+  const [provenance, setProvenance] = useState<Provenance | null>(
+    initialProvenance === "human" ? null : initialProvenance
+  );
   const [description, setDescription] = useState(initialDescription);
   const [pending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
@@ -35,6 +38,12 @@ export function AIDeclarationForm({
 
   return (
     <div>
+      {initialProvenance === "human" && (
+        <p style={{ color: "var(--vynl-texte-2)", fontSize: "0.875rem", marginBottom: "var(--space-sm)" }}>
+          This track was declared human-made. Vynl only accepts AI-generated music for now: choose how it was made
+          to update the declaration.
+        </p>
+      )}
       <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "var(--space-sm)" }}>
         {OPTIONS.map((option) => (
           <button

@@ -4,7 +4,6 @@ import { useActionState } from "react";
 import { applyCreator } from "@/app/actions/creator";
 
 const CONTENT_OPTIONS = [
-  { value: "human", label: "Human-made — written and performed by people" },
   { value: "ai", label: "AI-generated — created with AI tools" },
   { value: "hybrid", label: "Hybrid — a mix of both" },
 ];

@@ -120,7 +120,7 @@ export async function removeFile(trackId: string, fileId: string): Promise<void>
 
 export async function declareProvenance(
   trackId: string,
-  provenance: "human" | "ai" | "hybrid",
+  provenance: "ai" | "hybrid",
   description: string
 ): Promise<void> {
   const token = await accessToken();
