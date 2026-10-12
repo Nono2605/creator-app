@@ -44,6 +44,12 @@ export function AIDeclarationForm({
           to update the declaration.
         </p>
       )}
+      {provenance === "hybrid" && (
+        <p style={{ color: "var(--vynl-texte-2)", fontSize: "0.875rem", marginBottom: "var(--space-sm)" }}>
+          AI-assisted tracks are saved, but they are not accepted during the beta: Vynl publishes AI-generated music
+          only for now. You will not be able to submit this track for review yet.
+        </p>
+      )}
       <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "var(--space-sm)" }}>
         {OPTIONS.map((option) => (
           <button
