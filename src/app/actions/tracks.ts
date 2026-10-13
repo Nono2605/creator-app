@@ -35,6 +35,16 @@ export async function createTrackAction(
       { title, explicit },
       { accessToken: token }
     );
+    // Le genre est posé juste après : s'il échoue, le brouillon existe quand même et le genre se choisit
+    // sur la page du morceau (il est exigé seulement pour l'envoi en relecture).
+    const genre = String(formData.get("genre") ?? "");
+    if (genre) {
+      try {
+        await api.put(`/creator/tracks/${track.id}/genre`, { genre }, { accessToken: token });
+      } catch {
+        /* le créateur pourra le choisir sur la page du morceau */
+      }
+    }
     return { trackId: track.id };
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Could not create track." };
@@ -103,6 +113,14 @@ export async function updateTrackTitleAction(trackId: string, formData: FormData
   await api.patch(`/creator/tracks/${trackId}`, { title }, { accessToken: token });
   revalidatePath(`/tracks/${trackId}`);
   revalidatePath("/tracks");
+}
+
+// Le genre du morceau (liste fermée de l'API). Une valeur vide le retire.
+export async function setTrackGenreAction(trackId: string, formData: FormData): Promise<void> {
+  const token = await accessToken();
+  const genre = String(formData.get("genre") ?? "");
+  await api.put(`/creator/tracks/${trackId}/genre`, { genre: genre || null }, { accessToken: token });
+  revalidatePath(`/tracks/${trackId}`);
 }
 
 export async function deleteTrackAction(trackId: string): Promise<void> {

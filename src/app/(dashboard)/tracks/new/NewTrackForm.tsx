@@ -4,12 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createTrackAction } from "@/app/actions/tracks";
+import type { Genre } from "@/lib/genres";
 import { uploadAudio } from "@/lib/uploadAudio";
 
-export function NewTrackForm() {
+export function NewTrackForm({ genres }: { genres: Genre[] }) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [explicit, setExplicit] = useState(false);
+  const [genre, setGenre] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +31,7 @@ export function NewTrackForm() {
         const formData = new FormData();
         formData.set("title", title);
         if (explicit) formData.set("explicit", "on");
+        if (genre) formData.set("genre", genre);
 
         const result = await createTrackAction(undefined, formData);
         if (result.error || !result.trackId) {
@@ -69,6 +72,16 @@ export function NewTrackForm() {
         onChange={(e) => setTitle(e.target.value)}
         className="input-field"
       />
+      {genres.length > 0 && (
+        <select value={genre} onChange={(e) => setGenre(e.target.value)} className="input-field" aria-label="Genre">
+          <option value="">Genre (required to submit for review)</option>
+          {genres.map((g) => (
+            <option key={g.code} value={g.code}>
+              {g.label}
+            </option>
+          ))}
+        </select>
+      )}
       <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--vynl-texte-2)" }}>
         <input type="checkbox" checked={explicit} onChange={(e) => setExplicit(e.target.checked)} />
         Explicit content

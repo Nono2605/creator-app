@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireArtist } from "@/lib/session";
 import { api } from "@/lib/api";
+import { loadGenres, loadTrackGenre } from "@/lib/genres";
 import { dailySeries, hasNoListens, loadStats, parseRange } from "@/lib/stats";
 import { computeDelta, formatCount, formatListeningTime, previousRangeLabel } from "@/lib/formatStats";
 import { sourceLabel } from "@/lib/statsLabels";
@@ -19,6 +20,7 @@ import {
   updateTrackStatus,
   deleteTrackAction,
   updateTrackTitleAction,
+  setTrackGenreAction,
   removeFile,
 } from "@/app/actions/tracks";
 
@@ -82,6 +84,9 @@ export default async function TrackPage({
     declaration = null;
   }
 
+  // Genre : liste fermée de l'API. Ne lève jamais ; sans la liste, le choix n'est simplement pas affiché.
+  const [genres, trackGenre] = await Promise.all([loadGenres(), loadTrackGenre(session.access_token, id)]);
+
   // Écoutes de ce morceau : seulement une fois publié (un brouillon n'en a pas).
   // Ne lève jamais, comme la déclaration ci-dessus.
   const showStats = track.status === "published" || track.status === "archived";
@@ -111,6 +116,29 @@ export default async function TrackPage({
           Rename
         </button>
       </form>
+
+      {genres.length > 0 && (
+        <form action={setTrackGenreAction.bind(null, track.id)} style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)" }}>
+          <div style={{ display: "flex", gap: "var(--space-xs)" }}>
+            <select name="genre" defaultValue={trackGenre ?? ""} className="input-field" style={{ flex: 1 }} aria-label="Genre">
+              <option value="">No genre</option>
+              {genres.map((g) => (
+                <option key={g.code} value={g.code}>
+                  {g.label}
+                </option>
+              ))}
+            </select>
+            <button type="submit" className="btn btn-secondary">
+              Save genre
+            </button>
+          </div>
+          {!trackGenre && (
+            <p style={{ color: "var(--vynl-texte-2)", fontSize: "0.8125rem" }}>
+              A genre is required before you can submit this track for review.
+            </p>
+          )}
+        </form>
+      )}
 
       <section className="dash-card">
         <h2 className="section-title">Cover</h2>
