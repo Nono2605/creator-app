@@ -51,6 +51,12 @@ const ICONS = {
       <path d="M12 6.5V8M12 16v1.5" />
     </svg>
   ),
+  profile: (
+    <svg viewBox="0 0 24 24" className="icon" aria-hidden="true">
+      <circle cx="12" cy="8.5" r="3.5" />
+      <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+    </svg>
+  ),
   wallet: (
     <svg viewBox="0 0 24 24" className="icon" aria-hidden="true">
       <rect x="3" y="6.5" width="18" height="12" rx="3" />
@@ -70,6 +76,8 @@ const NAV_ITEMS = [
   { href: "/analytics", label: "Analytics", icon: ICONS.analytics, desktopOnly: false },
   { href: "/revenue", label: "Revenue", icon: ICONS.revenue, desktopOnly: true },
   { href: "/wallet", label: "Wallet", icon: ICONS.wallet, desktopOnly: true },
+  // Sur mobile, la page profil reste accessible par le nom de l'artiste dans l'en-tête.
+  { href: "/artist", label: "Profile", icon: ICONS.profile, desktopOnly: true },
 ] as const;
 
 export function Sidebar() {

@@ -4,6 +4,7 @@ import { api } from "@/lib/api";
 import { dailySeries, hasNoListens, loadStats, parseRange } from "@/lib/stats";
 import { computeDelta, formatCount, formatListeningTime, previousRangeLabel } from "@/lib/formatStats";
 import { StatusBadge } from "@/components/StatusBadge";
+import { joinParts, missingProfileParts } from "@/lib/artistProfile";
 import { StatTile } from "@/components/StatTile";
 import { RangeFilter } from "@/components/RangeFilter";
 import { TimeSeriesChart } from "@/components/TimeSeriesChart";
@@ -56,6 +57,7 @@ export default async function OverviewPage({
   const publishedCount = tracks.filter((t) => t.status === "published").length;
   const recentTracks = tracks.slice(0, 5);
   const comparedTo = previousRangeLabel(range);
+  const missingProfile = missingProfileParts(artist);
 
   return (
     <div style={{ maxWidth: "var(--content-max-width)", display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
@@ -69,6 +71,21 @@ export default async function OverviewPage({
         </div>
         <RangeFilter basePath="/" current={range} />
       </div>
+
+      {missingProfile.length > 0 && (
+        // Sans photo, l'artiste apparaît comme un vinyle vide dans Discover et la recherche.
+        <section className="dash-card callout">
+          <div>
+            <h2 className="section-title">Finish your public page</h2>
+            <p style={{ color: "var(--vynl-texte-2)" }}>
+              Add your {joinParts(missingProfile)} so listeners see you, not a blank vinyl, in Discover and search.
+            </p>
+          </div>
+          <Link href="/artist" className="btn btn-secondary btn-sm">
+            Edit your page
+          </Link>
+        </section>
+      )}
 
       {result.status !== "ok" ? (
         <StatsNotice result={result} />

@@ -4,10 +4,10 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { VinylCover } from "@/components/VinylCover";
-import { prepareCover } from "@/lib/prepareCover";
-import { friendlyCoverError } from "@/lib/uploadErrors";
+import { prepareImage } from "@/lib/prepareImage";
+import { IMAGE_SPECS } from "@/lib/imageCrop";
+import { friendlyImageError } from "@/lib/uploadErrors";
 import { getCoverUploadUrl, saveReleaseCover } from "@/app/actions/releases";
-import { COVER_MIN_SIDE } from "@/lib/coverCrop";
 
 type Phase = "idle" | "preparing" | "uploading" | "saving";
 
@@ -43,7 +43,7 @@ export function CoverField({ releaseId, coverUrl }: { releaseId: string; coverUr
   async function handleFile(file: File) {
     setError(null);
     setPhase("preparing");
-    const prepared = await prepareCover(file);
+    const prepared = await prepareImage(file, IMAGE_SPECS.cover);
     if (!prepared.ok) {
       setError(prepared.error);
       setPhase("idle");
@@ -66,7 +66,7 @@ export function CoverField({ releaseId, coverUrl }: { releaseId: string; coverUr
       setPreview(URL.createObjectURL(prepared.blob));
       startRefresh(() => router.refresh());
     } catch (err) {
-      setError(friendlyCoverError(err));
+      setError(friendlyImageError(err));
     } finally {
       setPhase("idle");
     }
@@ -105,7 +105,7 @@ export function CoverField({ releaseId, coverUrl }: { releaseId: string; coverUr
             : "Add the artwork listeners see for this release. It's printed on a vinyl in the Vynl app."}
         </p>
         <ul className="cover-field__tips">
-          <li>JPEG, PNG or WebP, at least {COVER_MIN_SIDE} × {COVER_MIN_SIDE} px (1400 × 1400 is ideal).</li>
+          <li>JPEG, PNG or WebP, at least {IMAGE_SPECS.cover.minWidth} × {IMAGE_SPECS.cover.minWidth} px (1400 × 1400 is ideal).</li>
           <li>We keep the center square. Square artwork is the safest.</li>
           <li>The vinyl shows a circle, so keep the key part of your artwork away from the corners.</li>
         </ul>
