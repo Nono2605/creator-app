@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { api } from "@/lib/api";
 import type { Me, Artist } from "@/lib/session";
 import { Logo } from "@/components/Logo";
+import { OnboardingSteps } from "@/components/OnboardingSteps";
+import { loadGenres } from "@/lib/genres";
+import { logout } from "@/app/actions/auth";
 import { ApplyForm } from "./ApplyForm";
 import { ArtistForm } from "./ArtistForm";
 
@@ -21,16 +24,22 @@ export default async function OnboardingPage() {
   }
 
   if (me.role !== "creator" && me.role !== "admin") {
+    const genres = await loadGenres();
     return (
       <div className="bg-signature" style={wrapperStyle}>
         <div style={logoStyle}>
           <Logo />
         </div>
+        <OnboardingSteps current="terms" />
         <h1 style={titleStyle}>Become a creator</h1>
+        {/* Le compte existe déjà : c'est celui de l'écoute. On le dit, avec de quoi changer de compte. */}
         <p style={subtitleStyle}>
-          Enable creator mode on your account to upload and manage music.
+          You&apos;re signed in as <strong style={{ color: "var(--vynl-texte)" }}>{me.email}</strong>. This is your Vynl
+          account, the same one you use to listen. Enabling creator mode adds the Studio to it; your library, playlists
+          and follows stay as they are.
         </p>
-        <ApplyForm />
+        <ApplyForm genres={genres} />
+        <SwitchAccount />
       </div>
     );
   }
@@ -52,10 +61,32 @@ export default async function OnboardingPage() {
       <div style={logoStyle}>
         <Logo />
       </div>
+      <OnboardingSteps current="artist" />
       <h1 style={titleStyle}>Create your artist page</h1>
-      <p style={subtitleStyle}>This is the public identity your tracks will be released under.</p>
+      <p style={subtitleStyle}>
+        This is the public identity your tracks will be released under.
+        {me.profile && (
+          <>
+            {" "}
+            It is separate from your listening profile (<strong style={{ color: "var(--vynl-texte)" }}>{me.profile.username}</strong>
+            ), which listeners keep seeing as before.
+          </>
+        )}
+      </p>
       <ArtistForm />
+      <SwitchAccount />
     </div>
+  );
+}
+
+// « Ce n'est pas mon compte » : se déconnecter pour entrer avec un autre compte Vynl.
+function SwitchAccount() {
+  return (
+    <form action={logout} style={{ marginTop: "var(--space-md)" }}>
+      <button type="submit" className="btn-plain" style={{ color: "var(--vynl-texte-2)", fontSize: "0.875rem" }}>
+        Not your account? Log out
+      </button>
+    </form>
   );
 }
 

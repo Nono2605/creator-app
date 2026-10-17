@@ -30,9 +30,13 @@ le port 3000).
 
 ## Parcours créateur
 
-1. `/signup` ou `/login` — même compte Supabase que l'app listener.
-2. `/onboarding` — active le rôle `creator` (`POST /creator/apply`), puis
-   crée la page artiste (`POST /creator/artist`).
+1. `/signup` ou `/login` — même compte Supabase que l'app listener (les deux
+   écrans le disent : un auditeur qui a déjà un compte s'y connecte, il n'en
+   crée pas un deuxième). Le lien du courriel de confirmation revient sur
+   `/auth/callback`, qui ouvre la session et envoie vers `/onboarding`.
+2. `/onboarding` — trois étapes visibles (compte, CGU créateur, nom d'artiste) :
+   active le rôle `creator` (`POST /creator/apply`), puis crée la page
+   artiste (`POST /creator/artist`).
 3. `/tracks` — liste des morceaux du créateur (tous statuts).
 4. `/tracks/new` — crée un morceau et uploade le fichier audio (URL signée
    Supabase Storage, bucket `track-audio`, jamais via ce serveur).
@@ -46,6 +50,15 @@ le port 3000).
    viennent de `GET /creator/stats`. Tant que la migration SQL
    `20261010000000_creator_stats.sql` n'est pas appliquée côté base, ces
    pages affichent « Coming » au lieu des graphiques.
+
+### Réglage Supabase pour le lien de confirmation
+
+Pour que le courriel de confirmation ramène dans le Studio (et non sur le site
+par défaut du projet, souvent l'app d'écoute), ajouter l'adresse du Studio dans
+Supabase > Authentication > URL Configuration > Redirect URLs :
+`https://<adresse-du-studio>/auth/callback` (et `http://localhost:3001/auth/callback`
+en local). Sans cette entrée rien ne casse : Supabase retombe sur le site par
+défaut du projet, comme avant.
 
 ## Tests
 

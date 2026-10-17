@@ -2,13 +2,14 @@
 
 import { useActionState } from "react";
 import { applyCreator } from "@/app/actions/creator";
+import type { Genre } from "@/lib/genres";
 
 const CONTENT_OPTIONS = [
   { value: "ai", label: "AI-generated — created with AI tools" },
   { value: "hybrid", label: "Hybrid — a mix of both" },
 ];
 
-export function ApplyForm() {
+export function ApplyForm({ genres }: { genres: Genre[] }) {
   const [state, action, pending] = useActionState(applyCreator, undefined);
 
   return (
@@ -34,6 +35,11 @@ export function ApplyForm() {
             <span>{option.label}</span>
           </label>
         ))}
+        {/* Même règle que l'API (bêta 100 % IA) : on le dit ici, pas seulement au moment d'envoyer un morceau. */}
+        <p style={{ color: "var(--vynl-texte-2)", fontSize: "0.8125rem" }}>
+          During the beta Vynl publishes AI-generated music only. Tracks declared as AI-assisted are saved but can&apos;t
+          be submitted for review yet.
+        </p>
       </fieldset>
 
       <label style={checkboxRowStyle}>
@@ -41,12 +47,22 @@ export function ApplyForm() {
         <span>I confirm I hold (or have licensed) the rights to the content I&apos;ll upload.</span>
       </label>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-        <label htmlFor="primary_genre" style={{ color: "var(--vynl-texte-2)", fontSize: "0.875rem" }}>
-          Primary genre (optional)
-        </label>
-        <input id="primary_genre" name="primary_genre" type="text" className="input-field" />
-      </div>
+      {/* La liste fermée de l'API (la même que pour les morceaux) ; sans elle, le champ est simplement absent. */}
+      {genres.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+          <label htmlFor="primary_genre" style={{ color: "var(--vynl-texte-2)", fontSize: "0.875rem" }}>
+            Primary genre (optional)
+          </label>
+          <select id="primary_genre" name="primary_genre" defaultValue="" className="input-field">
+            <option value="">No preference</option>
+            {genres.map((g) => (
+              <option key={g.code} value={g.label}>
+                {g.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {state?.error && <p style={{ color: "var(--vynl-erreur)" }}>{state.error}</p>}
       <button type="submit" disabled={pending} className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
