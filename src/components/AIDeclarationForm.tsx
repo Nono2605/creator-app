@@ -27,12 +27,15 @@ export function AIDeclarationForm({
   const [description, setDescription] = useState(initialDescription);
   const [pending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function handleSave() {
     if (!provenance) return;
+    setError(null);
     startTransition(async () => {
-      await declareProvenance(trackId, provenance, description);
-      setSaved(true);
+      const result = await declareProvenance(trackId, provenance, description);
+      if (result.ok) setSaved(true);
+      else setError(result.error);
     });
   }
 
@@ -58,6 +61,7 @@ export function AIDeclarationForm({
             onClick={() => {
               setProvenance(option.value);
               setSaved(false);
+              setError(null);
             }}
             className={`pill${provenance === option.value ? " active" : ""}`}
           >
@@ -70,6 +74,7 @@ export function AIDeclarationForm({
         onChange={(e) => {
           setDescription(e.target.value);
           setSaved(false);
+          setError(null);
         }}
         placeholder="Optional notes (e.g. which AI tools were used)"
         rows={2}
@@ -81,6 +86,11 @@ export function AIDeclarationForm({
           {pending ? "Saving…" : "Save declaration"}
         </button>
         {saved && <span style={{ color: "var(--vynl-succes)", fontSize: "0.875rem" }}>Saved</span>}
+        {error && (
+          <span role="alert" style={{ color: "var(--vynl-erreur)", fontSize: "0.875rem" }}>
+            {error}
+          </span>
+        )}
       </div>
       <p style={{ color: "var(--vynl-texte-2)", fontSize: "0.8125rem", marginTop: "0.5rem" }}>
         Recorded per track. A public display for listeners is coming soon.

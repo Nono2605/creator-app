@@ -5,6 +5,7 @@ import { api } from "@/lib/api";
 import { StatusBadge } from "@/components/StatusBadge";
 import { formatDuration } from "@/lib/formatDuration";
 import { CatalogCode } from "@/components/CatalogCode";
+import { ActionButton } from "@/components/ActionButton";
 import { CoverField } from "./CoverField";
 import {
   updateReleaseStatus,
@@ -121,11 +122,14 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
                 <span style={{ color: "var(--vynl-texte-2)", fontVariantNumeric: "tabular-nums" }}>
                   {formatDuration(track.duration_seconds)}
                 </span>
-                <form action={removeTrackFromRelease.bind(null, track.id, release.id)}>
-                  <button type="submit" className="btn-plain" style={{ color: "var(--vynl-texte-2)" }}>
-                    Remove
-                  </button>
-                </form>
+                <ActionButton
+                  action={removeTrackFromRelease.bind(null, track.id, release.id)}
+                  pendingLabel="Removing…"
+                  className="btn-plain"
+                  style={{ color: "var(--vynl-texte-2)" }}
+                >
+                  Remove
+                </ActionButton>
               </div>
             ))}
           </div>
@@ -140,18 +144,21 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
               <div key={track.id} className="list-row">
                 <span className="list-row__main">{track.title}</span>
                 <StatusBadge status={track.status} />
-                <form action={assignTrackToRelease.bind(null, track.id, release.id)}>
-                  <button type="submit" className="btn-plain text-link" style={{ fontWeight: 600 }}>
-                    Add
-                  </button>
-                </form>
+                <ActionButton
+                  action={assignTrackToRelease.bind(null, track.id, release.id)}
+                  pendingLabel="Adding…"
+                  className="btn-plain text-link"
+                  style={{ fontWeight: 600 }}
+                >
+                  Add
+                </ActionButton>
               </div>
             ))}
           </div>
         </section>
       )}
 
-      <section style={{ display: "flex", gap: "var(--space-sm)", flexWrap: "wrap" }}>
+      <section style={{ display: "flex", gap: "var(--space-sm)", flexWrap: "wrap", alignItems: "flex-start" }}>
         {release.status === "draft" &&
           (reviewBlocker ? (
             // Mêmes conditions que l'API : au moins un morceau, et de l'audio sur chacun.
@@ -164,32 +171,43 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
               </span>
             </div>
           ) : (
-            <form action={updateReleaseStatus.bind(null, release.id, "in_review")}>
-              <button type="submit" className="btn btn-primary">
+            // L'API vérifie aussi la déclaration IA et le genre de chaque morceau (ils ne sont pas
+            // chargés ici) : si l'un manque, son message dit lesquels, sous le bouton.
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+              <ActionButton action={updateReleaseStatus.bind(null, release.id, "in_review")} pendingLabel="Submitting…">
                 Submit for review
-              </button>
-            </form>
+              </ActionButton>
+              <span style={{ color: "var(--vynl-texte-2)", fontSize: "0.8125rem" }}>
+                Every track needs its audio, an AI declaration and a genre.
+              </span>
+            </div>
           ))}
         {release.status === "in_review" && (
-          <form action={updateReleaseStatus.bind(null, release.id, "draft")}>
-            <button type="submit" className="btn btn-secondary">
-              Withdraw to draft
-            </button>
-          </form>
+          <ActionButton
+            action={updateReleaseStatus.bind(null, release.id, "draft")}
+            pendingLabel="Withdrawing…"
+            className="btn btn-secondary"
+          >
+            Withdraw to draft
+          </ActionButton>
         )}
         {release.status === "published" && (
-          <form action={updateReleaseStatus.bind(null, release.id, "archived")}>
-            <button type="submit" className="btn btn-secondary">
-              Archive
-            </button>
-          </form>
+          <ActionButton
+            action={updateReleaseStatus.bind(null, release.id, "archived")}
+            pendingLabel="Archiving…"
+            className="btn btn-secondary"
+          >
+            Archive
+          </ActionButton>
         )}
         {release.status === "draft" && (
-          <form action={deleteReleaseAction.bind(null, release.id)}>
-            <button type="submit" className="btn btn-danger">
-              Delete release
-            </button>
-          </form>
+          <ActionButton
+            action={deleteReleaseAction.bind(null, release.id)}
+            pendingLabel="Deleting…"
+            className="btn btn-danger"
+          >
+            Delete release
+          </ActionButton>
         )}
       </section>
     </div>

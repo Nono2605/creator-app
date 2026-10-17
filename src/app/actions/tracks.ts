@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { api } from "@/lib/api";
+import { failure, OK, type ActionResult } from "@/lib/actionResult";
 
 async function accessToken(): Promise<string> {
   const supabase = await createClient();
@@ -99,53 +100,86 @@ export async function attachFile(
   return { ok: true };
 }
 
-export async function updateTrackStatus(trackId: string, status: string): Promise<void> {
+// Les actions suivantes sont appelées depuis des composants client (ActionButton, ActionForm) et
+// RENVOIENT leur échec comme les deux précédentes : sinon, en production, « Submit for review »
+// refusé parce qu'il manque un genre ne montrerait qu'une erreur générique.
+
+export async function updateTrackStatus(trackId: string, status: string): Promise<ActionResult> {
   const token = await accessToken();
-  await api.patch(`/creator/tracks/${trackId}`, { status }, { accessToken: token });
+  try {
+    await api.patch(`/creator/tracks/${trackId}`, { status }, { accessToken: token });
+  } catch (err) {
+    return failure(err, "Could not update the track. Please try again.");
+  }
   revalidatePath(`/tracks/${trackId}`);
   revalidatePath("/tracks");
+  return OK;
 }
 
-export async function updateTrackTitleAction(trackId: string, formData: FormData): Promise<void> {
+export async function updateTrackTitleAction(trackId: string, formData: FormData): Promise<ActionResult> {
   const token = await accessToken();
   const title = String(formData.get("title") ?? "").trim();
-  if (!title) return;
-  await api.patch(`/creator/tracks/${trackId}`, { title }, { accessToken: token });
+  if (!title) return { ok: false, error: "The title can't be empty." };
+  try {
+    await api.patch(`/creator/tracks/${trackId}`, { title }, { accessToken: token });
+  } catch (err) {
+    return failure(err, "Could not rename the track. Please try again.");
+  }
   revalidatePath(`/tracks/${trackId}`);
   revalidatePath("/tracks");
+  return OK;
 }
 
 // Le genre du morceau (liste fermée de l'API). Une valeur vide le retire.
-export async function setTrackGenreAction(trackId: string, formData: FormData): Promise<void> {
+export async function setTrackGenreAction(trackId: string, formData: FormData): Promise<ActionResult> {
   const token = await accessToken();
   const genre = String(formData.get("genre") ?? "");
-  await api.put(`/creator/tracks/${trackId}/genre`, { genre: genre || null }, { accessToken: token });
+  try {
+    await api.put(`/creator/tracks/${trackId}/genre`, { genre: genre || null }, { accessToken: token });
+  } catch (err) {
+    return failure(err, "Could not save the genre. Please try again.");
+  }
   revalidatePath(`/tracks/${trackId}`);
+  return OK;
 }
 
-export async function deleteTrackAction(trackId: string): Promise<void> {
+export async function deleteTrackAction(trackId: string): Promise<ActionResult> {
   const token = await accessToken();
-  await api.delete(`/creator/tracks/${trackId}`, { accessToken: token });
+  try {
+    await api.delete(`/creator/tracks/${trackId}`, { accessToken: token });
+  } catch (err) {
+    return failure(err, "Could not delete the track. Please try again.");
+  }
   revalidatePath("/tracks");
   redirect("/tracks");
 }
 
-export async function removeFile(trackId: string, fileId: string): Promise<void> {
+export async function removeFile(trackId: string, fileId: string): Promise<ActionResult> {
   const token = await accessToken();
-  await api.delete(`/creator/tracks/${trackId}/files/${fileId}`, { accessToken: token });
+  try {
+    await api.delete(`/creator/tracks/${trackId}/files/${fileId}`, { accessToken: token });
+  } catch (err) {
+    return failure(err, "Could not remove the file. Please try again.");
+  }
   revalidatePath(`/tracks/${trackId}`);
+  return OK;
 }
 
 export async function declareProvenance(
   trackId: string,
   provenance: "ai" | "hybrid",
   description: string
-): Promise<void> {
+): Promise<ActionResult> {
   const token = await accessToken();
-  await api.post(
-    `/creator/tracks/${trackId}/declaration`,
-    { provenance, description: description || undefined },
-    { accessToken: token }
-  );
+  try {
+    await api.post(
+      `/creator/tracks/${trackId}/declaration`,
+      { provenance, description: description || undefined },
+      { accessToken: token }
+    );
+  } catch (err) {
+    return failure(err, "Could not save the declaration. Please try again.");
+  }
   revalidatePath(`/tracks/${trackId}`);
+  return OK;
 }

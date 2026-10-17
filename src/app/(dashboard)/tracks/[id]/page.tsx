@@ -15,6 +15,9 @@ import { RangeFilter } from "@/components/RangeFilter";
 import { TimeSeriesChart } from "@/components/TimeSeriesChart";
 import { BarList } from "@/components/BarList";
 import { NoListens, StatsNotice } from "@/components/StatsNotice";
+import { ActionButton } from "@/components/ActionButton";
+import { ActionForm } from "@/components/ActionForm";
+import { trackReviewBlockers } from "@/lib/reviewBlockers";
 import { MakeSingle } from "./MakeSingle";
 import {
   updateTrackStatus,
@@ -48,6 +51,7 @@ interface Track {
 interface Declaration {
   provenance: "human" | "ai" | "hybrid";
   description: string | null;
+  status?: string | null;
 }
 
 function formatBytes(bytes: number | null): string {
@@ -87,6 +91,14 @@ export default async function TrackPage({
   // Genre : liste fermée de l'API. Ne lève jamais ; sans la liste, le choix n'est simplement pas affiché.
   const [genres, trackGenre] = await Promise.all([loadGenres(), loadTrackGenre(session.access_token, id)]);
 
+  // Ce qui empêche l'envoi en relecture (mêmes règles que l'API), dit avant le clic.
+  const reviewBlockers = trackReviewBlockers({
+    hasAudio: track.files.length > 0,
+    declaration,
+    genreAvailable: genres.length > 0,
+    hasGenre: Boolean(trackGenre),
+  });
+
   // Écoutes de ce morceau : seulement une fois publié (un brouillon n'en a pas).
   // Ne lève jamais, comme la déclaration ci-dessus.
   const showStats = track.status === "published" || track.status === "archived";
@@ -110,17 +122,22 @@ export default async function TrackPage({
         </span>
       </p>
 
-      <form action={updateTrackTitleAction.bind(null, track.id)} style={{ display: "flex", gap: "var(--space-xs)" }}>
-        <input name="title" defaultValue={track.title} className="input-field" style={{ flex: 1 }} />
-        <button type="submit" className="btn btn-secondary">
-          Rename
-        </button>
-      </form>
+      <ActionForm
+        action={updateTrackTitleAction.bind(null, track.id)}
+        submitLabel="Rename"
+        pendingLabel="Renaming…"
+      >
+        <input key={track.title} name="title" defaultValue={track.title} className="input-field" style={{ flex: 1 }} />
+      </ActionForm>
 
       {genres.length > 0 && (
-        <form action={setTrackGenreAction.bind(null, track.id)} style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)" }}>
-          <div style={{ display: "flex", gap: "var(--space-xs)" }}>
-            <select name="genre" defaultValue={trackGenre ?? ""} className="input-field" style={{ flex: 1 }} aria-label="Genre">
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)" }}>
+          <ActionForm
+            action={setTrackGenreAction.bind(null, track.id)}
+            submitLabel="Save genre"
+            pendingLabel="Saving…"
+          >
+            <select key={trackGenre ?? ""} name="genre" defaultValue={trackGenre ?? ""} className="input-field" style={{ flex: 1 }} aria-label="Genre">
               <option value="">No genre</option>
               {genres.map((g) => (
                 <option key={g.code} value={g.code}>
@@ -128,16 +145,13 @@ export default async function TrackPage({
                 </option>
               ))}
             </select>
-            <button type="submit" className="btn btn-secondary">
-              Save genre
-            </button>
-          </div>
+          </ActionForm>
           {!trackGenre && (
             <p style={{ color: "var(--vynl-texte-2)", fontSize: "0.8125rem" }}>
               A genre is required before you can submit this track for review.
             </p>
           )}
-        </form>
+        </div>
       )}
 
       <section className="dash-card">
@@ -241,11 +255,14 @@ export default async function TrackPage({
                 <span>
                   {file.format.toUpperCase()} · {formatBytes(file.file_size_bytes)}
                 </span>
-                <form action={removeFile.bind(null, track.id, file.id)}>
-                  <button type="submit" className="btn-plain" style={{ color: "var(--vynl-erreur)" }}>
-                    Remove
-                  </button>
-                </form>
+                <ActionButton
+                  action={removeFile.bind(null, track.id, file.id)}
+                  pendingLabel="Removing…"
+                  className="btn-plain"
+                  style={{ color: "var(--vynl-erreur)" }}
+                >
+                  Remove
+                </ActionButton>
               </div>
             ))}
           </div>
@@ -261,45 +278,50 @@ export default async function TrackPage({
         />
       </section>
 
-      <section style={{ display: "flex", gap: "var(--space-sm)", flexWrap: "wrap" }}>
+      <section style={{ display: "flex", gap: "var(--space-sm)", flexWrap: "wrap", alignItems: "flex-start" }}>
         {track.status === "draft" &&
-          (track.files.length === 0 ? (
-            // Sans audio il n'y a rien à relire : l'API refuse aussi ; ici on explique avant le clic.
+          (reviewBlockers.length > 0 ? (
+            // L'API refuse aussi ; ici on explique avant le clic ce qu'il reste à faire.
             <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
               <button type="button" className="btn btn-primary" disabled aria-describedby="review-blocker">
                 Submit for review
               </button>
-              <span id="review-blocker" style={{ color: "var(--vynl-texte-2)", fontSize: "0.8125rem" }}>
-                Add the audio file first.
-              </span>
+              <ul
+                id="review-blocker"
+                style={{ color: "var(--vynl-texte-2)", fontSize: "0.8125rem", paddingLeft: "1.1rem", margin: 0 }}
+              >
+                {reviewBlockers.map((blocker) => (
+                  <li key={blocker}>{blocker}</li>
+                ))}
+              </ul>
             </div>
           ) : (
-            <form action={updateTrackStatus.bind(null, track.id, "in_review")}>
-              <button type="submit" className="btn btn-primary">
-                Submit for review
-              </button>
-            </form>
+            <ActionButton action={updateTrackStatus.bind(null, track.id, "in_review")} pendingLabel="Submitting…">
+              Submit for review
+            </ActionButton>
           ))}
         {track.status === "in_review" && (
-          <form action={updateTrackStatus.bind(null, track.id, "draft")}>
-            <button type="submit" className="btn btn-secondary">
-              Withdraw to draft
-            </button>
-          </form>
+          <ActionButton
+            action={updateTrackStatus.bind(null, track.id, "draft")}
+            pendingLabel="Withdrawing…"
+            className="btn btn-secondary"
+          >
+            Withdraw to draft
+          </ActionButton>
         )}
         {track.status === "published" && (
-          <form action={updateTrackStatus.bind(null, track.id, "archived")}>
-            <button type="submit" className="btn btn-secondary">
-              Archive
-            </button>
-          </form>
+          <ActionButton
+            action={updateTrackStatus.bind(null, track.id, "archived")}
+            pendingLabel="Archiving…"
+            className="btn btn-secondary"
+          >
+            Archive
+          </ActionButton>
         )}
         {track.status === "draft" && (
-          <form action={deleteTrackAction.bind(null, track.id)}>
-            <button type="submit" className="btn btn-danger">
-              Delete track
-            </button>
-          </form>
+          <ActionButton action={deleteTrackAction.bind(null, track.id)} pendingLabel="Deleting…" className="btn btn-danger">
+            Delete track
+          </ActionButton>
         )}
       </section>
     </div>

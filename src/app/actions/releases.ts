@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { api } from "@/lib/api";
+import { failure, OK, type ActionResult } from "@/lib/actionResult";
 
 async function accessToken(): Promise<string> {
   const supabase = await createClient();
@@ -113,28 +114,51 @@ export async function makeSingleFromTrack(
   redirect(`/releases/${releaseId}`);
 }
 
-export async function updateReleaseStatus(releaseId: string, status: string): Promise<void> {
+// Appelées depuis des composants client (ActionButton) : elles RENVOIENT leur échec, car en
+// production Next masque le message d'une erreur levée. L'API dit précisément ce qui manque
+// (« 2 tracks cannot be reviewed yet… ») : le créateur le lit sous le bouton.
+
+export async function updateReleaseStatus(releaseId: string, status: string): Promise<ActionResult> {
   const token = await accessToken();
-  await api.patch(`/creator/albums/${releaseId}`, { status }, { accessToken: token });
+  try {
+    await api.patch(`/creator/albums/${releaseId}`, { status }, { accessToken: token });
+  } catch (err) {
+    return failure(err, "Could not update the release. Please try again.");
+  }
   revalidatePath(`/releases/${releaseId}`);
   revalidatePath("/releases");
+  return OK;
 }
 
-export async function deleteReleaseAction(releaseId: string): Promise<void> {
+export async function deleteReleaseAction(releaseId: string): Promise<ActionResult> {
   const token = await accessToken();
-  await api.delete(`/creator/albums/${releaseId}`, { accessToken: token });
+  try {
+    await api.delete(`/creator/albums/${releaseId}`, { accessToken: token });
+  } catch (err) {
+    return failure(err, "Could not delete the release. Please try again.");
+  }
   revalidatePath("/releases");
   redirect("/releases");
 }
 
-export async function assignTrackToRelease(trackId: string, releaseId: string): Promise<void> {
+export async function assignTrackToRelease(trackId: string, releaseId: string): Promise<ActionResult> {
   const token = await accessToken();
-  await api.patch(`/creator/tracks/${trackId}`, { album_id: releaseId }, { accessToken: token });
+  try {
+    await api.patch(`/creator/tracks/${trackId}`, { album_id: releaseId }, { accessToken: token });
+  } catch (err) {
+    return failure(err, "Could not add the track. Please try again.");
+  }
   revalidatePath(`/releases/${releaseId}`);
+  return OK;
 }
 
-export async function removeTrackFromRelease(trackId: string, releaseId: string): Promise<void> {
+export async function removeTrackFromRelease(trackId: string, releaseId: string): Promise<ActionResult> {
   const token = await accessToken();
-  await api.patch(`/creator/tracks/${trackId}`, { album_id: null }, { accessToken: token });
+  try {
+    await api.patch(`/creator/tracks/${trackId}`, { album_id: null }, { accessToken: token });
+  } catch (err) {
+    return failure(err, "Could not remove the track. Please try again.");
+  }
   revalidatePath(`/releases/${releaseId}`);
+  return OK;
 }
