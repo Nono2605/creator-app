@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requireArtist } from "@/lib/session";
 import { api } from "@/lib/api";
 import { loadGenres, loadTrackGenre } from "@/lib/genres";
+import { loadTrackDetails } from "@/lib/details";
 import { dailySeries, hasNoListens, loadStats, parseRange } from "@/lib/stats";
 import { computeDelta, formatCount, formatListeningTime, previousRangeLabel } from "@/lib/formatStats";
 import { sourceLabel } from "@/lib/statsLabels";
@@ -20,6 +21,7 @@ import { ActionForm } from "@/components/ActionForm";
 import { nameStatusOf } from "@/lib/artistNameStatus";
 import { trackReviewBlockers } from "@/lib/reviewBlockers";
 import { MakeSingle } from "./MakeSingle";
+import { TrackDetailsForm } from "./TrackDetailsForm";
 import {
   updateTrackStatus,
   deleteTrackAction,
@@ -90,14 +92,22 @@ export default async function TrackPage({
   }
 
   // Genre : liste fermée de l'API. Ne lève jamais ; sans la liste, le choix n'est simplement pas affiché.
-  const [genres, trackGenre] = await Promise.all([loadGenres(), loadTrackGenre(session.access_token, id)]);
+  const [genres, trackGenre, details] = await Promise.all([
+    loadGenres(),
+    loadTrackGenre(session.access_token, id),
+    loadTrackDetails(session.access_token, id),
+  ]);
+  // Plusieurs genres, styles et crédits : seulement quand la base sait les enregistrer (migration des détails
+  // appliquée) ; sinon le choix d'un seul genre d'avant.
+  const detailsForm = details?.available ? details : null;
+  const mainGenre = detailsForm ? (detailsForm.genres[0] ?? null) : trackGenre;
 
   // Ce qui empêche l'envoi en relecture (mêmes règles que l'API), dit avant le clic.
   const reviewBlockers = trackReviewBlockers({
     hasAudio: track.files.length > 0,
     declaration,
     genreAvailable: genres.length > 0,
-    hasGenre: Boolean(trackGenre),
+    hasGenre: Boolean(mainGenre),
     artistNameStatus: nameStatusOf(artist),
   });
 
@@ -132,28 +142,32 @@ export default async function TrackPage({
         <input key={track.title} name="title" defaultValue={track.title} className="input-field" style={{ flex: 1 }} />
       </ActionForm>
 
-      {genres.length > 0 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)" }}>
-          <ActionForm
-            action={setTrackGenreAction.bind(null, track.id)}
-            submitLabel="Save genre"
-            pendingLabel="Saving…"
-          >
-            <select key={trackGenre ?? ""} name="genre" defaultValue={trackGenre ?? ""} className="input-field" style={{ flex: 1 }} aria-label="Genre">
-              <option value="">No genre</option>
-              {genres.map((g) => (
-                <option key={g.code} value={g.code}>
-                  {g.label}
-                </option>
-              ))}
-            </select>
-          </ActionForm>
-          {!trackGenre && (
-            <p style={{ color: "var(--vynl-texte-2)", fontSize: "0.8125rem" }}>
-              A genre is required before you can submit this track for review.
-            </p>
-          )}
-        </div>
+      {detailsForm ? (
+        <TrackDetailsForm trackId={track.id} genres={genres} initial={detailsForm} />
+      ) : (
+        genres.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)" }}>
+            <ActionForm
+              action={setTrackGenreAction.bind(null, track.id)}
+              submitLabel="Save genre"
+              pendingLabel="Saving…"
+            >
+              <select key={trackGenre ?? ""} name="genre" defaultValue={trackGenre ?? ""} className="input-field" style={{ flex: 1 }} aria-label="Genre">
+                <option value="">No genre</option>
+                {genres.map((g) => (
+                  <option key={g.code} value={g.code}>
+                    {g.label}
+                  </option>
+                ))}
+              </select>
+            </ActionForm>
+            {!trackGenre && (
+              <p style={{ color: "var(--vynl-texte-2)", fontSize: "0.8125rem" }}>
+                A genre is required before you can submit this track for review.
+              </p>
+            )}
+          </div>
+        )
       )}
 
       <section className="dash-card">

@@ -1297,3 +1297,8 @@ input[type="file"]::file-selector-button:hover {
   gap: var(--space-md);
   flex-wrap: wrap;
 }
+
+/* Texte discret : légendes, compléments (assistant « nouvelle release », crédits). */
+.muted {
+  color: var(--vynl-texte-2);
+}

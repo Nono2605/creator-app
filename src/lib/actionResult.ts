@@ -19,3 +19,14 @@ export function failure(err: unknown, fallback: string): ActionResult {
   }
   return { ok: false, error: fallback };
 }
+
+// Le texte d'erreur seul, pour les actions qui renvoient leur propre forme de résultat.
+export function errorText(err: unknown, fallback: string): string {
+  const result = failure(err, fallback);
+  return result.ok ? fallback : result.error;
+}
+
+// L'API répond 503 quand une migration de la base n'est pas appliquée : c'est à l'équipe d'agir, pas au créateur.
+export function isUnavailable(err: unknown): boolean {
+  return err instanceof Error && (err as Error & { status?: number }).status === 503;
+}

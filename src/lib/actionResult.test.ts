@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { failure, OK } from "./actionResult.ts";
+import { errorText, failure, isUnavailable, OK } from "./actionResult.ts";
 
 // Même forme que ApiError (lib/api.ts) sans importer ce module, qui lit l'environnement.
 class FakeApiError extends Error {
@@ -43,5 +43,17 @@ describe("failure", () => {
 
   it("OK est un succès", () => {
     assert.deepEqual(OK, { ok: true });
+  });
+
+  it("errorText ne rend que le texte", () => {
+    assert.equal(errorText(new FakeApiError("Nope."), "Fallback."), "Nope.");
+    assert.equal(errorText(new FakeApiError("boom", 500), "Fallback."), "Fallback.");
+  });
+
+  it("isUnavailable reconnaît un 503 de l'API", () => {
+    assert.equal(isUnavailable(new FakeApiError("Release details are not available yet", 503)), true);
+    assert.equal(isUnavailable(new FakeApiError("Nope.", 409)), false);
+    assert.equal(isUnavailable(new Error("x")), false);
+    assert.equal(isUnavailable("x"), false);
   });
 });

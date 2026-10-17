@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireArtist } from "@/lib/session";
+import { loadReleaseDetails } from "@/lib/details";
 import { api } from "@/lib/api";
 import { StatusBadge } from "@/components/StatusBadge";
 import { formatDuration } from "@/lib/formatDuration";
@@ -8,6 +9,7 @@ import { nameStatusBlocker, nameStatusOf } from "@/lib/artistNameStatus";
 import { CatalogCode } from "@/components/CatalogCode";
 import { ActionButton } from "@/components/ActionButton";
 import { CoverField } from "./CoverField";
+import { ReleaseDetailsForm } from "./ReleaseDetailsForm";
 import {
   updateReleaseStatus,
   deleteReleaseAction,
@@ -65,6 +67,9 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
     availableTracks = [];
   }
 
+  // Date, label, copyright, description : seulement quand la base sait les enregistrer (migration des détails).
+  const details = await loadReleaseDetails(session.access_token, id);
+
   // Une release ne part en relecture qu'avec au moins un morceau, et de l'audio sur chacun
   // (la durée n'est connue qu'une fois le fichier audio mesuré).
   const withoutAudio = release.tracks.filter((t) => t.duration_seconds === null).length;
@@ -91,6 +96,8 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
         <h2 className="section-title">Cover</h2>
         <CoverField releaseId={release.id} coverUrl={release.cover_url} />
       </section>
+
+      {details?.available && <ReleaseDetailsForm releaseId={release.id} initial={details} />}
 
       <section className="dash-card">
         <h2 className="section-title">Tracks</h2>

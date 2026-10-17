@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { api } from "@/lib/api";
-import { failure, OK, type ActionResult } from "@/lib/actionResult";
+import { errorText, failure, isUnavailable, OK, type ActionResult } from "@/lib/actionResult";
+import type { TrackPayload } from "@/lib/releaseDraft";
 
 async function accessToken(): Promise<string> {
   const supabase = await createClient();
@@ -158,6 +159,88 @@ export async function removeTrackFromRelease(trackId: string, releaseId: string)
     await api.patch(`/creator/tracks/${trackId}`, { album_id: null }, { accessToken: token });
   } catch (err) {
     return failure(err, "Could not remove the track. Please try again.");
+  }
+  revalidatePath(`/releases/${releaseId}`);
+  return OK;
+}
+
+// ── Assistant « nouvelle release » et détails d'une release ──────────────
+// Appelées depuis le navigateur : elles RENVOIENT l'échec au lieu de le lever (Next masque le message d'une
+// erreur levée en production). Une migration de la base pas encore appliquée (503) se dit clairement.
+
+const DETAILS_UNAVAILABLE =
+  "This needs the latest database update (release details). Create an empty release for now and add tracks one by one.";
+
+export type CreateReleaseDraftResult =
+  | { ok: true; releaseId: string; warning?: string }
+  | { ok: false; error: string };
+
+// Crée la release en brouillon, puis y range ses détails facultatifs (date, label, copyright, description).
+export async function createReleaseDraft(input: {
+  title: string;
+  type: string;
+  details: Record<string, string> | null;
+}): Promise<CreateReleaseDraftResult> {
+  const token = await accessToken();
+  const title = input.title.trim();
+  if (!title) return { ok: false, error: "Give the release a title." };
+
+  let releaseId: string;
+  try {
+    const release = await api.post<{ id: string }>("/creator/albums", { title, type: input.type }, { accessToken: token });
+    releaseId = release.id;
+  } catch (err) {
+    return { ok: false, error: errorText(err, "Could not create the release. Please try again.") };
+  }
+
+  let warning: string | undefined;
+  if (input.details) {
+    try {
+      await api.put(`/creator/albums/${releaseId}/details`, input.details, { accessToken: token });
+    } catch (err) {
+      warning = isUnavailable(err)
+        ? "The release was created, but its date, label and description need the latest database update."
+        : `The release was created, but its details weren't saved: ${errorText(err, "please add them on the release page.")}`;
+    }
+  }
+  revalidatePath("/releases");
+  return { ok: true, releaseId, warning };
+}
+
+export type CreateTrackResult = { ok: true; trackId: string } | { ok: false; error: string };
+
+// Crée un morceau directement dans la release, avec ses genres, styles, crédits et sa déclaration IA. Son fichier
+// audio part ensuite du navigateur vers le stockage.
+export async function createTrackInRelease(
+  releaseId: string,
+  payload: TrackPayload,
+  position: number
+): Promise<CreateTrackResult> {
+  const token = await accessToken();
+  try {
+    const track = await api.post<{ id: string }>(
+      `/creator/albums/${releaseId}/tracks`,
+      { ...payload, position, provenance: payload.provenance ?? undefined },
+      { accessToken: token }
+    );
+    return { ok: true, trackId: track.id };
+  } catch (err) {
+    if (isUnavailable(err)) return { ok: false, error: DETAILS_UNAVAILABLE };
+    return { ok: false, error: errorText(err, "Could not create this track. Please try again.") };
+  }
+}
+
+// Les détails facultatifs d'une release : un champ vide l'efface.
+export async function saveReleaseDetails(
+  releaseId: string,
+  details: { release_date: string; label: string; copyright_line: string; description: string }
+): Promise<ActionResult> {
+  const token = await accessToken();
+  try {
+    await api.put(`/creator/albums/${releaseId}/details`, details, { accessToken: token });
+  } catch (err) {
+    if (isUnavailable(err)) return { ok: false, error: DETAILS_UNAVAILABLE };
+    return failure(err, "Could not save the details. Please try again.");
   }
   revalidatePath(`/releases/${releaseId}`);
   return OK;

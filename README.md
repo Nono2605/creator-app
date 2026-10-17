@@ -45,6 +45,17 @@ le port 3000).
 3. `/tracks` — liste des morceaux du créateur (tous statuts).
 4. `/tracks/new` — crée un morceau et uploade le fichier audio (URL signée
    Supabase Storage, bucket `track-audio`, jamais via ce serveur).
+   `/releases/new` — l'assistant « nouvelle release » : la release (type, titre,
+   genres jusqu'à 3, styles libres, déclaration IA, puis date, label, copyright,
+   description facultatifs), plusieurs fichiers audio d'un coup (un morceau par
+   fichier : titre, genres, styles, artistes invités, déclaration IA), puis
+   création en brouillon (`POST /creator/albums`, `POST /creator/albums/:id/tracks`)
+   et envoi des fichiers un à un. Un morceau qui échoue se réessaie seul. Les
+   genres, styles et crédits d'un morceau se modifient ensuite sur sa page
+   (`PUT /creator/tracks/:id/details`), les détails d'une release sur la sienne
+   (`PUT /creator/albums/:id/details`). Migration de l'API
+   `20261018000000_release_details.sql` ; avant elle, le Studio garde le choix
+   d'un seul genre et l'assistant répond « pas encore disponible ».
 5. `/tracks/[id]` — édite le titre, gère les fichiers, transitionne le
    statut (`draft` → `in_review` → `archived`). Le passage à `published`
    est réservé à la modération admin, hors périmètre de cette app.

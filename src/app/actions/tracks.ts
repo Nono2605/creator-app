@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { api } from "@/lib/api";
-import { failure, OK, type ActionResult } from "@/lib/actionResult";
+import { failure, isUnavailable, OK, type ActionResult } from "@/lib/actionResult";
 
 async function accessToken(): Promise<string> {
   const supabase = await createClient();
@@ -182,4 +182,49 @@ export async function declareProvenance(
   }
   revalidatePath(`/tracks/${trackId}`);
   return OK;
+}
+
+// ── Détails d'un morceau : genres (jusqu'à 3), styles, artistes invités ──
+
+export async function saveTrackDetails(
+  trackId: string,
+  details: {
+    genres: string[];
+    tags: string[];
+    credits: { role: string; artist_id: string | null; name: string }[];
+  }
+): Promise<ActionResult> {
+  const token = await accessToken();
+  try {
+    await api.put(`/creator/tracks/${trackId}/details`, details, { accessToken: token });
+  } catch (err) {
+    if (isUnavailable(err)) {
+      return { ok: false, error: "This needs the latest database update (release details)." };
+    }
+    return failure(err, "Could not save the details. Please try again.");
+  }
+  revalidatePath(`/tracks/${trackId}`);
+  return OK;
+}
+
+export interface ArtistHit {
+  id: string;
+  name: string;
+  slug: string;
+  avatar_url: string | null;
+}
+
+// Recherche d'un artiste Vynl à créditer, pendant la saisie. Ne lève jamais : une panne donne une liste vide.
+export async function searchArtistsAction(query: string): Promise<ArtistHit[]> {
+  const token = await accessToken();
+  const q = query.trim().slice(0, 60);
+  if (q.length < 2) return [];
+  try {
+    const { data } = await api.get<{ data: ArtistHit[] }>(`/creator/artists/search?q=${encodeURIComponent(q)}`, {
+      accessToken: token,
+    });
+    return data;
+  } catch {
+    return [];
+  }
 }
