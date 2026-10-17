@@ -36,7 +36,12 @@ le port 3000).
    `/auth/callback`, qui ouvre la session et envoie vers `/onboarding`.
 2. `/onboarding` — trois étapes visibles (compte, CGU créateur, nom d'artiste) :
    active le rôle `creator` (`POST /creator/apply`), puis crée la page
-   artiste (`POST /creator/artist`).
+   artiste (`POST /creator/artist`). Le nom est contrôlé pendant la saisie
+   (`GET /creator/artist/name-check`) : un nom proche d'un autre est accepté
+   mais relu par l'administration (`name_status = pending`) ; en attendant la
+   page n'est pas publique et aucune release ne peut être soumise. Un nom
+   refusé (avec son motif) ou en attente se change depuis `/artist`
+   (`PATCH /creator/artist/name`) ; un nom accepté est permanent.
 3. `/tracks` — liste des morceaux du créateur (tous statuts).
 4. `/tracks/new` — crée un morceau et uploade le fichier audio (URL signée
    Supabase Storage, bucket `track-audio`, jamais via ce serveur).

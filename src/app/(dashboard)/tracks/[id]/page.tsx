@@ -17,6 +17,7 @@ import { BarList } from "@/components/BarList";
 import { NoListens, StatsNotice } from "@/components/StatsNotice";
 import { ActionButton } from "@/components/ActionButton";
 import { ActionForm } from "@/components/ActionForm";
+import { nameStatusOf } from "@/lib/artistNameStatus";
 import { trackReviewBlockers } from "@/lib/reviewBlockers";
 import { MakeSingle } from "./MakeSingle";
 import {
@@ -68,7 +69,7 @@ export default async function TrackPage({
 }) {
   const { id } = await params;
   const range = parseRange((await searchParams).range);
-  const { session } = await requireArtist();
+  const { session, artist } = await requireArtist();
 
   let track: Track;
   try {
@@ -97,6 +98,7 @@ export default async function TrackPage({
     declaration,
     genreAvailable: genres.length > 0,
     hasGenre: Boolean(trackGenre),
+    artistNameStatus: nameStatusOf(artist),
   });
 
   // Écoutes de ce morceau : seulement une fois publié (un brouillon n'en a pas).

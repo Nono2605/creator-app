@@ -35,6 +35,20 @@ describe("trackReviewBlockers", () => {
     ]);
   });
 
+  it("un nom d'artiste en attente ou refusé passe en premier : rien ne part tant qu'il n'est pas accepté", () => {
+    assert.deepEqual(trackReviewBlockers({ ...ready, artistNameStatus: "pending" }), [
+      "Your artist name is still being reviewed.",
+    ]);
+    assert.deepEqual(
+      trackReviewBlockers({ hasAudio: false, declaration: null, genreAvailable: true, hasGenre: false, artistNameStatus: "rejected" })[0],
+      "Choose another artist name (Profile page)."
+    );
+  });
+
+  it("un nom accepté, ou un statut absent, ne bloque rien", () => {
+    assert.deepEqual(trackReviewBlockers({ ...ready, artistNameStatus: "approved" }), []);
+  });
+
   it("sans liste de genres (migration absente, API muette), le genre n'est pas exigé", () => {
     assert.deepEqual(trackReviewBlockers({ ...ready, genreAvailable: false, hasGenre: false }), []);
   });

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireArtist } from "@/lib/session";
 import { Sidebar } from "@/components/Sidebar";
 import { Logo } from "@/components/Logo";
+import { NameStatusBanner } from "@/components/NameStatusBanner";
 import { logout } from "@/app/actions/auth";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -31,7 +32,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </button>
           </form>
         </header>
-        <main className="studio__content">{children}</main>
+        <main className="studio__content">
+          <NameStatusBanner artist={artist} />
+          {children}
+        </main>
       </div>
     </div>
   );

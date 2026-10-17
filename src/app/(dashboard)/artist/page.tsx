@@ -1,6 +1,8 @@
 import { requireArtist } from "@/lib/session";
 import { ArtistProfileForm } from "./ArtistProfileForm";
 import { CatalogCode } from "@/components/CatalogCode";
+import { nameStatusOf } from "@/lib/artistNameStatus";
+import { ArtistNameCard } from "./ArtistNameCard";
 
 export default async function ArtistProfilePage() {
   const { artist } = await requireArtist();
@@ -15,7 +17,10 @@ export default async function ArtistProfilePage() {
         This is the public identity shown on your artist page. Your artist number is permanent: it stays attached to
         your catalog and statements.
       </p>
-      <ArtistProfileForm artist={artist} />
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
+        <ArtistNameCard name={artist.name} status={nameStatusOf(artist)} note={artist.name_review_note ?? null} />
+        <ArtistProfileForm artist={artist} />
+      </div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { api } from "@/lib/api";
 import { BIO_MAX, COUNTRY_MAX } from "@/lib/artistProfile";
+import { failure } from "@/lib/actionResult";
 
 async function accessToken(): Promise<string> {
   const supabase = await createClient();
@@ -86,4 +87,59 @@ export async function saveArtistImage(
   }
   revalidateProfile();
   return { ok: true };
+}
+
+// ── Nom d'artiste ───────────────────────────────────────────────────────
+// Un nom proche d'un autre attend la décision de l'administration (page non publique, rien à soumettre
+// d'ici là). Le contrôle en direct le dit AVANT que le créateur ne choisisse ; le nom accepté, lui, est
+// permanent : seul un nom en attente ou refusé se change.
+
+export type ArtistNameCheck =
+  | { ok: true; available: true; similar: string[] }
+  | { ok: true; available: false; message: string; suggestions: string[] }
+  | { ok: false; error: string };
+
+// Appelée depuis le navigateur pendant la saisie : elle RENVOIE l'échec au lieu de le lever.
+export async function checkArtistNameAction(name: string): Promise<ArtistNameCheck> {
+  const token = await accessToken();
+  try {
+    const res = await api.get<{
+      available: boolean;
+      message?: string;
+      suggestions?: string[];
+      similar?: string[];
+    }>(`/creator/artist/name-check?name=${encodeURIComponent(name.slice(0, 100))}`, { accessToken: token });
+    if (res.available) return { ok: true, available: true, similar: res.similar ?? [] };
+    return {
+      ok: true,
+      available: false,
+      message: res.message ?? "This name can't be used.",
+      suggestions: res.suggestions ?? [],
+    };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Could not check this name." };
+  }
+}
+
+export async function renameArtistAction(
+  _state: ArtistFormState | undefined,
+  formData: FormData
+): Promise<ArtistFormState> {
+  const token = await accessToken();
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return { error: "Enter an artist name." };
+
+  try {
+    const artist = await api.patch<{ name_status?: string }>("/creator/artist/name", { name }, { accessToken: token });
+    revalidateProfile();
+    return {
+      message:
+        artist.name_status === "pending"
+          ? "Saved. Our team will review this name before your page goes public."
+          : "Your new artist name is saved.",
+    };
+  } catch (err) {
+    const failed = failure(err, "Could not change the artist name. Please try again.");
+    return { error: failed.ok ? "Could not change the artist name. Please try again." : failed.error };
+  }
 }

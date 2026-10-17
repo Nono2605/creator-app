@@ -21,6 +21,10 @@ export interface Artist {
   banner_url: string | null;
   country: string | null;
   verified: boolean;
+  /** Relecture du nom par l'administration (absent avant la migration de l'API : le nom compte comme accepté). */
+  name_status?: "approved" | "pending" | "rejected";
+  /** Le motif d'un refus, écrit pour l'artiste. */
+  name_review_note?: string | null;
 }
 
 // Toutes ces fonctions sont enveloppées dans React `cache()` : le layout du

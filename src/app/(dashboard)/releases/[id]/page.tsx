@@ -4,6 +4,7 @@ import { requireArtist } from "@/lib/session";
 import { api } from "@/lib/api";
 import { StatusBadge } from "@/components/StatusBadge";
 import { formatDuration } from "@/lib/formatDuration";
+import { nameStatusBlocker, nameStatusOf } from "@/lib/artistNameStatus";
 import { CatalogCode } from "@/components/CatalogCode";
 import { ActionButton } from "@/components/ActionButton";
 import { CoverField } from "./CoverField";
@@ -43,7 +44,7 @@ interface CreatorTrack {
 
 export default async function ReleasePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { session } = await requireArtist();
+  const { session, artist } = await requireArtist();
 
   let release: Release;
   try {
@@ -68,11 +69,12 @@ export default async function ReleasePage({ params }: { params: Promise<{ id: st
   // (la durée n'est connue qu'une fois le fichier audio mesuré).
   const withoutAudio = release.tracks.filter((t) => t.duration_seconds === null).length;
   const reviewBlocker =
-    release.tracks.length === 0
+    nameStatusBlocker(nameStatusOf(artist)) ??
+    (release.tracks.length === 0
       ? "Add at least one track first."
       : withoutAudio > 0
         ? `${withoutAudio} ${withoutAudio === 1 ? "track still needs" : "tracks still need"} an audio file.`
-        : null;
+        : null);
 
   return (
     <div style={{ maxWidth: 640, display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
